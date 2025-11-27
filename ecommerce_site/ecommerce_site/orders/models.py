@@ -1,27 +1,13 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django.contrib.auth import get_user_model
 
 from .choices import (
     OrderStatusChoices, PaymentStatusChoices
 )
 
-User = get_user_model()
-
 
 class Order(TimeStampedModel):
-    user = models.ForeignKey(
-        "users.User",
-        on_delete=models.CASCADE,
-        related_name="orders",
-    )
-    shipping_address = models.ForeignKey(
-        "users.ShippingAddress",
-        on_delete=models.CASCADE,
-        related_name="shipping_address",
-    )
-
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     order_status = models.CharField(
         max_length=10,
@@ -29,23 +15,37 @@ class Order(TimeStampedModel):
         default=OrderStatusChoices.PENDING,
     )
 
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="orders",
+    )
+
+    shipping_address = models.ForeignKey(
+        "users.ShippingAddress",
+        on_delete=models.CASCADE,
+        related_name="orders",
+    )
+
     def __str__(self):
         return f"Order {self.total_amount} by {self.user.username}"
 
 
 class OrderItem(models.Model):
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
+
     order = models.ForeignKey(
         "orders.Order",
         on_delete=models.CASCADE,
         related_name="order_items"
     )
+
     product = models.ForeignKey(
         "products.Product",
         on_delete=models.CASCADE,
         related_name="order_items",
     )
-    item_quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    item_price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.product.product_name} in Order {self.order.id}"
@@ -59,25 +59,28 @@ class Cart(TimeStampedModel):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(
-        "orders.Cart",
-        on_delete=models.CASCADE,
-        related_name="cart_items",
-    )
+    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+
     product = models.ForeignKey(
         "products.Product",
         on_delete=models.CASCADE,
         related_name="cart_items"
     )
-    quantity = models.PositiveIntegerField(default=1,validators=[MinValueValidator(1)])
+
+    cart = models.ForeignKey(
+        "orders.Cart",
+        on_delete=models.CASCADE,
+        related_name="cart_items",
+    )
 
     def __str__(self):
         return f"{self.product.name} with quantity {self.quantity}"
 
 
 class Payment(TimeStampedModel):
-    order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
+
     status = models.CharField(
         max_length=10,
         choices=PaymentStatusChoices.choices,
