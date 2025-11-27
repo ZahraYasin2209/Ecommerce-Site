@@ -25,10 +25,10 @@ class ShippingAddress(TimeStampedModel):
     )
 
     recipient_name = models.CharField(max_length=100)
-    recipient_email = models.EmailField(max_length=100)
     recipient_phone = models.CharField(max_length=20)
-    recipient_address = models.TextField()
     recipient_area_postal_code = models.CharField(max_length=20)
+    recipient_address = models.TextField()
+    recipient_email = models.EmailField(max_length=100)
 
     def __str__(self):
         return f"Address {self.recipient_address} for {self.user.username}"

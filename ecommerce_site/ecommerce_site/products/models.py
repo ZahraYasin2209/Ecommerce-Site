@@ -1,17 +1,19 @@
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from users.models import User
+from django.contrib.auth import get_user_model
 
 from .choices import (
     RatingChoices, SizeChoices
 )
 
+User = get_user_model()
+
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.category_name
+        return self.name
 
 
 class Product(TimeStampedModel):
@@ -32,11 +34,11 @@ class ProductImage(models.Model):
         on_delete=models.CASCADE,
         related_name="images",
     )
-    product_image = models.ImageField(upload_to="product_images/%Y/%m/%d/")
-    product_alt_text = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="product_images/%Y/%m/%d/")
+    alt_text = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"Image {self.product_image} for {self.product.name}"
+        return f"Image {self.image} for {self.product.name}"
 
 
 class ProductDetail(models.Model):
@@ -45,16 +47,14 @@ class ProductDetail(models.Model):
         on_delete=models.CASCADE,
         related_name="product_details",
     )
-    product_size = models.CharField(
-        max_length=20,
-        choices=SizeChoices.choices,
-    )
-    product_material = models.CharField(max_length=100)
-    product_color = models.CharField(max_length=100)
 
-    product_stock = models.PositiveIntegerField()
-    product_price = models.DecimalField(max_digits=10, decimal_places=2)
-    product_description = models.TextField()
+    size = models.CharField(max_length=20,choices=SizeChoices.choices)
+    material = models.CharField(max_length=100)
+    color = models.CharField(max_length=100)
+
+    stock = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField()
 
     def __str__(self):
         return f"{self.product.name} Details"
@@ -71,6 +71,7 @@ class ReviewAndRating(models.Model):
         on_delete=models.CASCADE,
         related_name="user_reviews",
     )
+
     rating_scale = models.IntegerField(choices=RatingChoices.choices,)
     review_text = models.TextField()
 

@@ -1,11 +1,13 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from users.models import User
+from django.contrib.auth import get_user_model
 
 from .choices import (
     OrderStatusChoices, PaymentStatusChoices
 )
+
+User = get_user_model()
 
 
 class Order(TimeStampedModel):
@@ -14,12 +16,13 @@ class Order(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="orders",
     )
-    total_order_amount = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_address = models.ForeignKey(
         "users.ShippingAddress",
         on_delete=models.CASCADE,
         related_name="shipping_address",
     )
+
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     order_status = models.CharField(
         max_length=10,
         choices=OrderStatusChoices.choices,
@@ -27,7 +30,7 @@ class Order(TimeStampedModel):
     )
 
     def __str__(self):
-        return f"Order {self.total_order_amount} by {self.user.username}"
+        return f"Order {self.total_amount} by {self.user.username}"
 
 
 class OrderItem(models.Model):
@@ -69,17 +72,17 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1,validators=[MinValueValidator(1)])
 
     def __str__(self):
-        return f"{self.product.product_name} with quantity {self.quantity}"
+        return f"{self.product.name} with quantity {self.quantity}"
 
 
 class Payment(TimeStampedModel):
     order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
-    payment_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_status = models.CharField(
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(
         max_length=10,
         choices=PaymentStatusChoices.choices,
         default=PaymentStatusChoices.PENDING
     )
 
     def __str__(self):
-        return f"Payment {self.payment_amount} for Order {self.order.id}"
+        return f"Payment {self.amount} for Order {self.order.id}"
