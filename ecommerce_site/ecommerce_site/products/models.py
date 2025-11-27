@@ -18,7 +18,7 @@ class Product(TimeStampedModel):
     category = models.ForeignKey(
         "products.Category",
         on_delete=models.CASCADE,
-        related_name="product",
+        related_name="products",
     )
 
     def __str__(self):
@@ -59,19 +59,19 @@ class ProductDetail(models.Model):
 
 
 class Review(models.Model):
-    rating = models.IntegerField(choices=RatingChoices.choices,)
+    rating = models.IntegerField(choices=RatingChoices.choices)
     comment = models.TextField()
 
     product = models.ForeignKey(
         "products.Product",
         on_delete=models.CASCADE,
-        related_name="review",
+        related_name="reviews",
     )
 
     user = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
-        related_name="review",
+        related_name="reviews",
     )
 
     def __str__(self):
