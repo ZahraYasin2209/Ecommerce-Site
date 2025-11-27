@@ -9,7 +9,7 @@ from .choices import (
 
 class Order(TimeStampedModel):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    order_status = models.CharField(
+    status = models.CharField(
         max_length=10,
         choices=OrderStatusChoices.choices,
         default=OrderStatusChoices.PENDING,
@@ -79,13 +79,13 @@ class CartItem(models.Model):
 
 class Payment(TimeStampedModel):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
-
     status = models.CharField(
         max_length=10,
         choices=PaymentStatusChoices.choices,
         default=PaymentStatusChoices.PENDING
     )
+
+    order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Payment {self.amount} for Order {self.order.id}"
