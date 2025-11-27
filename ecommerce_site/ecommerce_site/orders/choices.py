@@ -1,13 +1,14 @@
 from django.db import models
 
 
-class PaymentStatusChoices(models.TextChoices):
-    PENDING = "pending", "Pending"
-    DONE = "done", "Done"
-    FAILED = "failed", "Failed"
-
-
 class OrderStatusChoices(models.TextChoices):
-    PENDING = "pending", "Pending"
-    COMPLETED = "completed", "Completed"
-    CANCELED = "canceled", "Canceled"
+    PENDING = "PENDING", "Pending"
+    COMPLETED = "COMPLETED", "Completed"
+    CANCELED = "CANCELED", "Canceled"
+
+
+class PaymentStatusChoices(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    DONE = "DONE", "Done"
+    FAILED = "FAILED", "Failed"
+    
