@@ -4,9 +4,9 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Django migrations (optional, if you want to ignore auto-generated migration files)
-*./migrations/*.pyc
-*./migrations/__pycache__/
+# Django migrations (optional, ignore compiled files)
+**/migrations/*.pyc
+**/migrations/__pycache__/
 
 # Django local files (optional)
 *.sqlite3
