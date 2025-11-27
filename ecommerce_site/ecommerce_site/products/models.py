@@ -72,7 +72,7 @@ class ReviewAndRating(models.Model):
         related_name="user_reviews",
     )
 
-    rating_scale = models.IntegerField(choices=RatingChoices.choices,)
+    rating_scale = models.IntegerField(choices=RatingChoices.choices)
     review_text = models.TextField()
 
     def __str__(self):
