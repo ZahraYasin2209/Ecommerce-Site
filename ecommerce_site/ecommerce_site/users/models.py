@@ -1,40 +1,34 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
+from django_extensions.db.models import TimeStampedModel
 
-class User(AbstractUser):
-    user_id = models.AutoField(primary_key=True)
+from .choices import UserRoleChoices
 
-    email = models.EmailField(
-        max_length=254, unique=True
-    )
 
-    date_joined = models.DateTimeField(default=timezone.now)
-
-    ROLE_CHOICES = (
-        ('admin', 'Admin'),
-        ('customer', 'Customer'),
-    )
-
+class User(TimeStampedModel, AbstractUser):
+    email = models.EmailField(max_length=254, unique=True)
     user_role = models.CharField(
-        max_length=10, choices=ROLE_CHOICES, default='admin'
+        max_length=10,
+        choices=UserRoleChoices.choices,
+        default=UserRoleChoices.ADMIN,
     )
 
     def __str__(self):
         return self.username
 
 
-class ShippingAddress(models.Model):
-    shipping_address_id = models.AutoField(primary_key=True)
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class ShippingAddress(TimeStampedModel):
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="user_shipping_address"
+    )
 
     recipient_name = models.CharField(max_length=100)
     recipient_email = models.EmailField(max_length=100)
     recipient_phone = models.CharField(max_length=20)
-
     recipient_address = models.TextField()
-    recipient_area_postal_code = models.IntegerField(default=0)
+    recipient_area_postal_code = models.CharField(max_length=20)
 
     def __str__(self):
         return f"Address {self.recipient_address} for {self.user.username}"

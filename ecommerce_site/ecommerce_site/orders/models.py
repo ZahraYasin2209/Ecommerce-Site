@@ -1,34 +1,29 @@
+from django.core.validators import MinValueValidator
 from django.db import models
-from django.contrib.auth.models import User
+from django_extensions.db.models import TimeStampedModel
+from users.models import User
 
-class Order(models.Model):
-    ORDER_STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-    )
+from .choices import (
+    OrderStatusChoices, PaymentStatusChoices
+)
 
-    order_id = models.AutoField(primary_key=True)
 
+class Order(TimeStampedModel):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="orders",
     )
-
-    total_order_amount = models.DecimalField(
-        max_digits=10, decimal_places=2
+    total_order_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    shipping_address = models.ForeignKey(
+        "users.ShippingAddress",
+        on_delete=models.CASCADE,
+        related_name="shipping_address",
     )
-
-    shipping_address_id = models.ForeignKey(
-        'ShippingAddress', on_delete=models.CASCADE
-    )
-
-    order_created_at = models.DateTimeField(auto_now_add=True)
-    order_status = models.BooleanField(default=False)
-
-    order_status_choices = models.CharField(
+    order_status = models.CharField(
         max_length=10,
-        choices=ORDER_STATUS_CHOICES,
-        default='pending'
+        choices=OrderStatusChoices.choices,
+        default=OrderStatusChoices.PENDING,
     )
 
     def __str__(self):
@@ -36,82 +31,55 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    item_id = models.AutoField(primary_key=True)
-
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE
+        "orders.Order",
+        on_delete=models.CASCADE,
+        related_name="order_items"
     )
-
     product = models.ForeignKey(
-        'Product', on_delete=models.CASCADE
+        "products.Product",
+        on_delete=models.CASCADE,
+        related_name="order_items",
     )
-
-    item_quantity = models.IntegerField(default=1)
-
-    item_price_at_purchase = models.DecimalField(
-        max_digits=10, decimal_places=2
-    )
+    item_quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    item_price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.product.product_name} in Order {self.order.order_id}"
+        return f"{self.product.product_name} in Order {self.order.id}"
 
 
-class Cart(models.Model):
-    cart_id = models.AutoField(primary_key=True)
-
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE
-    )
-
-    cart_created_at = models.DateTimeField(auto_now_add=True)
-
-    cart_updated_at = models.DateTimeField(auto_now=True)
+class Cart(TimeStampedModel):
+    user = models.OneToOneField("users.User", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Cart of {self.user.username} by {self.cart_created_at}"
+        return f"Cart of {self.user.username}"
 
 
 class CartItem(models.Model):
-    item_id = models.AutoField(primary_key=True)
-
     cart = models.ForeignKey(
-        Cart, on_delete=models.CASCADE
+        "orders.Cart",
+        on_delete=models.CASCADE,
+        related_name="cart_items",
     )
-
     product = models.ForeignKey(
-        'Product', on_delete=models.CASCADE
+        "products.Product",
+        on_delete=models.CASCADE,
+        related_name="cart_items"
     )
-
-    product_quantity = models.IntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1,validators=[MinValueValidator(1)])
 
     def __str__(self):
-        return f"{self.product.product_name} with quantity {self.product_quantity}"
+        return f"{self.product.product_name} with quantity {self.quantity}"
 
 
-class Payment(models.Model):
-    PAYMENT_STATUS = (
-        ('pending', 'Pending'),
-        ('done', 'Done'),
-        ('failed', 'Failed'),
-    )
-
-    payment_id = models.AutoField(primary_key=True)
-
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE
-    )
-
-    payment_amount = models.DecimalField(
-        max_digits=10, decimal_places=2
-    )
-
+class Payment(TimeStampedModel):
+    order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_status = models.CharField(
         max_length=10,
-        choices=PAYMENT_STATUS,
-        default='pending'
+        choices=PaymentStatusChoices.choices,
+        default=PaymentStatusChoices.PENDING
     )
 
-    payment_date = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
-        return f"Payment {self.payment_amount} for Order {self.order.order_id}"
+        return f"Payment {self.payment_amount} for Order {self.order.id}"

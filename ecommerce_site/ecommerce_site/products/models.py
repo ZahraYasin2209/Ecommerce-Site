@@ -1,88 +1,78 @@
-from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
+from django_extensions.db.models import TimeStampedModel
+from users.models import User
+
+from .choices import (
+    RatingChoices, SizeChoices
+)
+
 
 class Category(models.Model):
-    category_id = models.AutoField(primary_key=True)
-
     category_name = models.CharField(max_length=100)
-
-    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.category_name
 
 
-class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
-
+class Product(TimeStampedModel):
     category = models.ForeignKey(
-        Category, on_delete=models.CASCADE
+        "products.Category",
+        on_delete=models.CASCADE,
+        related_name="products",
     )
-
-    product_name = models.CharField(max_length=100)
-    product_created_at = models.DateTimeField(default=timezone.now)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.product_name
+        return self.name
 
 
 class ProductImage(models.Model):
-    product_image_id = models.AutoField(primary_key=True)
-
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE
+        "products.Product",
+        on_delete=models.CASCADE,
+        related_name="images",
     )
-
-    product_image = models.ImageField(
-        "Product Image", upload_to="product_images"
-    )
-
+    product_image = models.ImageField(upload_to="product_images/%Y/%m/%d/")
     product_alt_text = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"Image {self.product_image} for {self.product.product_name}"
+        return f"Image {self.product_image} for {self.product.name}"
 
 
 class ProductDetail(models.Model):
-    product_code = models.AutoField(primary_key=True)
-
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE
+        "products.Product",
+        on_delete=models.CASCADE,
+        related_name="product_details",
     )
-
-    product_size = models.CharField(max_length=100)
+    product_size = models.CharField(
+        max_length=20,
+        choices=SizeChoices.choices,
+    )
     product_material = models.CharField(max_length=100)
     product_color = models.CharField(max_length=100)
 
-    product_stock = models.IntegerField()
-
-    product_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
-
+    product_stock = models.PositiveIntegerField()
+    product_price = models.DecimalField(max_digits=10, decimal_places=2)
     product_description = models.TextField()
 
     def __str__(self):
-        return f"{self.product.product_name} Details"
+        return f"{self.product.name} Details"
 
 
 class ReviewAndRating(models.Model):
-    review_id = models.AutoField(primary_key=True)
-
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE
+        "products.Product",
+        on_delete=models.CASCADE,
+        related_name="product_rating",
     )
-
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="user_reviews",
     )
-
-    rating_scale = models.IntegerField(default=1)
+    rating_scale = models.IntegerField(choices=RatingChoices.choices,)
     review_text = models.TextField()
 
-    rating_created_at = models.DateTimeField(default=timezone.now)
-
     def __str__(self):
-        return f"{self.rating_scale} by {self.user.username}"
+        return f"{self.rating_scale} by {self.user.username} for {self.product.name}"
