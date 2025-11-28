@@ -15,6 +15,7 @@ class Category(models.Model):
 
 class Product(TimeStampedModel):
     name = models.CharField(max_length=100)
+
     category = models.ForeignKey(
         "products.Category",
         on_delete=models.CASCADE,
