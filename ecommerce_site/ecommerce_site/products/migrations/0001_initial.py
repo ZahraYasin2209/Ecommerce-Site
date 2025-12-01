@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
                 ('name', models.CharField(max_length=100)),
+                ('code', models.CharField(blank=True, max_length=50)),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='products.category')),
             ],
             options={
@@ -56,7 +57,7 @@ class Migration(migrations.Migration):
                 ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
                 ('alt_text', models.CharField(max_length=100)),
-                ('url', models.URLField(default='https://www.junaidjamshed.com/media/catalog/product/3/7/37745_1_.jpg', max_length=500)),
+                ('url', models.URLField(max_length=500)),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='products.product')),
             ],
             options={
