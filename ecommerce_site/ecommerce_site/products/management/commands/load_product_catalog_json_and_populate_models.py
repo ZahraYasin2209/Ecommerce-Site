@@ -23,11 +23,12 @@ from .mappings import (
 
 
 class Command(BaseCommand):
-    help = (
-        "Reads product information from clothes.json and stores it across all product-related models "
-        "in the database. This includes automatically detecting and assigning categories, creating or "
-        "updating products, generating product details, saving product images, cleaning price formats, "
-        "and performing all operations inside an atomic transaction to maintain data integrity."
+     help = (
+        "Reads product information from clothes.json and stores it across all product-related "
+        "models in the database. This includes automatically detecting and assigning categories,"
+        "creating or updating products, generating product details, saving product images, "
+        "leaning price formats, and performing all operations inside an atomic transaction to "
+        "maintain data integrity."
     )
 
     def get_category_from_product_name(self, product_name):
