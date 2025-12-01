@@ -24,38 +24,43 @@ from .mappings import (
 
 class Command(BaseCommand):
     help = (
-        "Reads product information from clothes.json and stores it across all product-related models "
-        "in the database. This includes automatically detecting and assigning categories, creating or "
-        "updating products, generating product details, saving product images, cleaning price formats, "
-        "and performing all operations inside an atomic transaction to maintain data integrity."
+        "Imports product data from the 'clothes.json' file. This process involves cleaning price "
+        "formats, automatically assigning categories based on product name keywords, and "
+        "performing atomic Create or Update (CRUD) operations on the Product, ProductDetail, "
+        "and ProductImage models to ensure data consistency and integrity."
     )
 
     def get_category_from_product_name(self, product_name):
-        assigned_category_name = CATEGORY_MAPPING["OTHERS"]
-
-        for category_identifier, category_name in CATEGORY_MAPPING.items():
-            if category_identifier == "OTHERS":
-                continue
-
-            if category_identifier in product_name.upper():
-                assigned_category_name = category_name
+        assigned_category_name = next(
+            (
+                category_name
+                for category_identifier, category_name in CATEGORY_MAPPING.items()
+                if category_identifier != "OTHERS"
+                   and category_identifier in product_name.upper()
+            ),
+            CATEGORY_MAPPING["OTHERS"]
+        )
 
         return assigned_category_name
 
     def get_product_material(self, product_details):
-        found_product_material = "N/A"
+        product_material_details = " ".join(product_details).upper()
 
-        for product_material in PRODUCT_MATERIALS:
-            if any(product_material in product_attribute for product_attribute in product_details):
-                found_product_material = product_material
-
-        return found_product_material
+        return next(
+            (
+                product_material
+                for product_material in PRODUCT_MATERIALS
+                if product_material.upper() in product_material_details
+            ),
+            "N/A"
+    )
 
     def handle(self, *args, **options):
-        command_dir = os.path.dirname(os.path.abspath(__file__))
-
-        data_dir = os.path.join(os.path.dirname(command_dir), "data")
-        json_file_path = os.path.join(data_dir, "clothes.json")
+        json_file_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "data",
+            "clothes.json"
+        )
 
         self.stdout.write(f"Starting product data import from {json_file_path}")
 
@@ -66,8 +71,6 @@ class Command(BaseCommand):
             raise CommandError(
                 "Error decoding JSON file. Check for syntax errors."
             )
-        except Exception as error:
-            raise CommandError(f"An unexpected error occurred: {error}")
 
         total_products_counter = len(product_data_list)
         success_imports_counter = 0
@@ -75,17 +78,16 @@ class Command(BaseCommand):
         with transaction.atomic():
             for product_json_record in product_data_list:
                 try:
-                    price_string = product_json_record.get("product_price", "0.00")
-
-                    cleaned_price_str = (
-                        price_string.replace("PKR\xa0", "")
+                    price_string = (
+                        product_json_record.get("product_price", "0.00")
+                        .replace("PKR\xa0", "")
                         .replace("PKR ", "")
                         .replace(",", "")
                         .strip()
                     )
 
                     try:
-                        product_price = Decimal(cleaned_price_str)
+                        product_price = Decimal(price_string)
                     except InvalidOperation:
                         self.stdout.write(self.style.WARNING(
                             f"Skipping '{product_json_record.get('product_name')}': "
@@ -93,9 +95,8 @@ class Command(BaseCommand):
                         ))
                         continue
 
-                    product_name = product_json_record.get(
-                        "product_name"
-                    ).strip()
+                    product_name = product_json_record.get("product_name").strip()
+                    product_code = product_json_record.get("product_code", product_name)
 
                     assigned_category_name = self.get_category_from_product_name(
                         product_name
@@ -112,51 +113,38 @@ class Command(BaseCommand):
                             )
                         )
 
-                    product_defaults = {
-                        "category": product_category,
-                    }
-
-                    product_instance, product_created = Product.objects.update_or_create(
-                        name=product_name,
-                        defaults=product_defaults
+                    product_instance, _ = Product.objects.update_or_create(
+                        code=product_code,
+                        defaults={
+                            "name": product_name,
+                            "category": product_category,
+                        }
                     )
 
                     product_info_list = product_json_record.get(
                         "product_info", []
                     )
 
-                    product_color = (
-                        product_info_list[0] if product_info_list else "N/A"
-                    )
-
-                    product_material = self.get_product_material(product_info_list)
-
-                    product_description = "\n".join(product_info_list)
-
                     ProductDetail.objects.update_or_create(
                         product=product_instance,
                         defaults={
                             "size": DEFAULT_SIZE,
-                            "material": product_material,
-                            "color": product_color,
+                            "material": self.get_product_material(product_info_list),
+                            "color": product_info_list[0] if product_info_list else "N/A",
                             "stock": DEFAULT_STOCK,
                             "price": product_price,
-                            "description": product_description,
+                            "description": "\n".join(product_info_list),
                         }
                     )
 
-                    image_url_list = product_json_record.get(
-                        "product_images", []
-                    )
-
-                    for image_index, image_source_url in enumerate(image_url_list):
-                        alt_text = f"{product_name} - Image {image_index + 1}"
-
+                    for image_index, image_source_url in enumerate(
+                        product_json_record.get("product_images", [])
+                    ):
                         ProductImage.objects.update_or_create(
                             url=image_source_url,
                             defaults={
                                 "product": product_instance,
-                                "alt_text": alt_text,
+                                "alt_text": f"{product_name} - Image {image_index + 1}",
                             }
                         )
 
