@@ -57,14 +57,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        json_file_path = (
-                Path(os.path.abspath(__file__)).parent.parent / "data" / "clothes.json"
-        )
-
-        self.stdout.write(f"Starting product data import from {json_file_path}")
-
         try:
-            with open(json_file_path, "r", encoding="utf-8") as json_file:
+            with open(
+                    Path(os.path.abspath(__file__)).parent.parent / "data" / "clothes.json", "r", encoding="utf-8"
+            ) as json_file:
                 product_data_list = json.load(json_file)
         except json.JSONDecodeError:
             raise CommandError(
