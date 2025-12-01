@@ -27,8 +27,11 @@ class Product(TimeStampedModel):
 
 
 class ProductImage(TimeStampedModel):
-    image = models.ImageField(upload_to="product_images/%Y/%m/%d/")
     alt_text = models.CharField(max_length=100)
+    url = models.URLField(
+        max_length=500,
+        default="https://www.junaidjamshed.com/media/catalog/product/3/7/37745_1_.jpg"
+    )
 
     product = models.ForeignKey(
         "products.Product",
