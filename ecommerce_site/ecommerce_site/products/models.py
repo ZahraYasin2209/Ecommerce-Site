@@ -18,8 +18,6 @@ class Product(TimeStampedModel):
     code = models.CharField(
         max_length=50,
         unique=True,
-        null=True,
-        blank=True
     )
 
     category = models.ForeignKey(
@@ -36,7 +34,6 @@ class ProductImage(TimeStampedModel):
     alt_text = models.CharField(max_length=100)
     url = models.URLField(
         max_length=500,
-        default="https://www.junaidjamshed.com/media/catalog/product/3/7/37745_1_.jpg"
     )
 
     product = models.ForeignKey(

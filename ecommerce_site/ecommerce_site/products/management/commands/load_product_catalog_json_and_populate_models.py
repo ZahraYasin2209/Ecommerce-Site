@@ -1,6 +1,7 @@
 import json
 import os
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
 from django.core.management.base import (
     BaseCommand, CommandError
@@ -56,10 +57,8 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        json_file_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "data",
-            "clothes.json"
+        json_file_path = (
+                Path(os.path.abspath(__file__)).parent.parent / "data" / "clothes.json"
         )
 
         self.stdout.write(f"Starting product data import from {json_file_path}")
