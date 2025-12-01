@@ -47,7 +47,8 @@ class Command(BaseCommand):
         found_product_material = "N/A"
 
         for product_material in PRODUCT_MATERIALS:
-            if any(product_material in product_attribute for product_attribute in product_details):
+            if any(product_material in product_attribute
+                   for product_attribute in product_details):
                 found_product_material = product_material
 
         return found_product_material
