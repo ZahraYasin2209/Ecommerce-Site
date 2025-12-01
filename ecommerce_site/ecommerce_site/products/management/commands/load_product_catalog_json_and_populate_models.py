@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 if product_material.upper() in product_material_details
             ),
             "N/A"
-    )
+        )
 
     def handle(self, *args, **options):
         json_file_path = (
