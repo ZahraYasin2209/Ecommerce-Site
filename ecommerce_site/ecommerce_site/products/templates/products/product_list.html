@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-4">
+  <div class="row">
+    <aside class="col-md-3">
+      <form method="get" action="{% url 'products:list' %}" class="mb-3">
+        <div class="input-group">
+          <input class="form-control" name="q" placeholder="Search products..." value="{{ q }}">
+          <button class="btn btn-outline-secondary">Search</button>
+        </div>
+      </form>
+
+      <h6>Categories</h6>
+      <ul class="list-unstyled">
+        <li><a href="{% url 'products:list' %}?q=">All</a></li>
+        {% for cat in categories %}
+          <li class="{% if current_category and cat.pk == current_category.pk %}fw-bold{% endif %}">
+            <a href="{% url 'products:category_products' cat.pk %}">{{ cat.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <hr>
+      <h6>Sort</h6>
+      <ul class="list-unstyled">
+        <li><a href="?order=newest{% if q %}&q={{ q }}{% endif %}">Newest</a></li>
+        <li><a href="?order=price_asc{% if q %}&q={{ q }}{% endif %}">Price: Low to High</a></li>
+        <li><a href="?order=price_desc{% if q %}&q={{ q }}{% endif %}">Price: High to Low</a></li>
+      </ul>
+    </aside>
+
+    <main class="col-md-9">
+      <div class="row g-3">
+        {% for product in object_list %}
+          <div class="col-6 col-md-4">
+            {% include "products/_product_card.html" with product=product %}
+          </div>
+        {% empty %}
+          <p>No products found.</p>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.has_other_pages %}
+      <nav class="mt-4">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">&laquo;</a></li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+              {% if num == page_obj.number %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}">{{ num }}</a></li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">&raquo;</a></li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </main>
+  </div>
+</div>
+{% endblock %}
