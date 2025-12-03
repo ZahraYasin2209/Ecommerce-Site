@@ -6,14 +6,14 @@
     <aside class="col-md-3">
       <form method="get" action="{% url 'products:list' %}" class="mb-3">
         <div class="input-group">
-          <input class="form-control" name="q" placeholder="Search products..." value="{{ q }}">
+          <input class="form-control" name="search" placeholder="Search products..." value="{{ search }}">
           <button class="btn btn-outline-secondary">Search</button>
         </div>
       </form>
 
       <h6>Categories</h6>
       <ul class="list-unstyled">
-        <li><a href="{% url 'products:list' %}?q=">All</a></li>
+        <li><a href="{% url 'products:list' %}?search=">All</a></li>
         {% for cat in categories %}
           <li class="{% if current_category and cat.pk == current_category.pk %}fw-bold{% endif %}">
             <a href="{% url 'products:category_products' cat.pk %}">{{ cat.name }}</a>
@@ -24,9 +24,15 @@
       <hr>
       <h6>Sort</h6>
       <ul class="list-unstyled">
-        <li><a href="?order=newest{% if q %}&q={{ q }}{% endif %}">Newest</a></li>
-        <li><a href="?order=price_asc{% if q %}&q={{ q }}{% endif %}">Price: Low to High</a></li>
-        <li><a href="?order=price_desc{% if q %}&q={{ q }}{% endif %}">Price: High to Low</a></li>
+        <li><a href="?order=newest_first{% if search %}&q={{ search }}{% endif %}">
+            Newest
+        </a></li>
+        <li><a href="?order=price_low_to_high{% if search %}&search={{ search }}{% endif %}">
+            Price: Low to High
+        </a></li>
+        <li><a href="?order=price_high_to_low{% if search %}&search={{ search }}{% endif %}">
+            Price: High to Low
+        </a></li>
       </ul>
     </aside>
 
@@ -45,7 +51,7 @@
       <nav class="mt-4">
         <ul class="pagination">
           {% if page_obj.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">&laquo;</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">&laquo;</a></li>
           {% else %}
           <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
           {% endif %}
@@ -55,13 +61,13 @@
               {% if num == page_obj.number %}
                 <li class="page-item active"><span class="page-link">{{ num }}</span></li>
               {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}">{{ num }}</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}">{{ num }}</a></li>
               {% endif %}
             {% endif %}
           {% endfor %}
 
           {% if page_obj.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">&raquo;</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}">&raquo;</a></li>
           {% else %}
           <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
           {% endif %}
@@ -71,4 +77,5 @@
     </main>
   </div>
 </div>
+
 {% endblock %}
