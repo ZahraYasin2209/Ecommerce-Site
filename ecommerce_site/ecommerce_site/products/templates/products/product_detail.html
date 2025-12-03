@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="container my-4 product-detail-page">
+  <div class="row">
+    <div class="col-md-6">
+      {% if images %}
+        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for img in images %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="{{ img.url }}" class="d-block w-100 product-image" alt="{{ img.alt_text }}">
+            </div>
+            {% endfor %}
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+          </button>
+        </div>
+      {% else %}
+        <div class="border p-5 text-center rounded bg-light">No image</div>
+      {% endif %}
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="product-title">
+        {{ product.name }}
+      </h2>
+
+      <p class="product-meta">Code: {{ product.code }}</p>
+      <p class="product-meta">Category: {{ product.category.name }}</p>
+
+      {% if default_detail %}
+        <h3 class="product-price">PKR {{ default_detail.price }}</h3>
+
+        {% if product.color %}
+        <p class="product-attribute">{{ product.color }}</p>
+        {% endif %}
+
+        {% if product.type %}
+        <p class="product-attribute">{{ product.type }}</p>
+        {% endif %}
+
+        {% if product.collection %}
+        <p class="product-attribute">{{ product.collection }}</p>
+        {% endif %}
+
+        {% if product.material %}
+        <p class="product-attribute">{{ product.material }}</p>
+        {% endif %}
+
+        <div class="product-description">
+            {{ default_detail.description|linebreaks }}
+        </div>
+
+      {% else %}
+        <h3 class="product-price">N/A</h3>
+      {% endif %}
+
+      <hr>
+
+      <form method="post" action="{% url 'products:add_to_cart' product.pk %}">
+        {% csrf_token %}
+        <div class="mb-2">
+          <label for="detail" class="form-label fw-semibold">Choose size / variant</label>
+          <select name="detail_id" id="detail" class="form-select" required>
+            {% for d in details %}
+              <option value="{{ d.pk }}">
+                {{ d.size }} — PKR {{ d.price }} —
+                {% if d.stock > 0 %}
+                  In stock ({{ d.stock }})
+                {% else %}
+                  Out of stock
+                {% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="quantity" class="form-label fw-semibold">Quantity</label>
+          <input type="number" name="quantity" id="quantity" min="1" value="1"
+                 class="form-control quantity-box">
+        </div>
+
+        <button class="btn btn-primary add-cart-btn" type="submit">
+          Add to Cart
+        </button>
+      </form>
+
+      <hr>
+
+      <h5 class="fw-bold mb-3">Reviews</h5>
+
+      {% if reviews %}
+        <div class="reviews-box">
+          {% for r in reviews %}
+            <div class="review-item">
+              <strong>{{ r.user.username }}</strong> — {{ r.rating }} / 5
+              <div>{{ r.comment }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="no-reviews">No reviews yet.</p>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
