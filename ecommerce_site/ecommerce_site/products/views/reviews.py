@@ -10,13 +10,13 @@ def add_review(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
     if request.method == "POST":
-        form = ReviewForm(request.POST)
-        if form.is_valid():
+        product_review_form = ReviewForm(request.POST)
+        if product_review_form.is_valid():
             Review.objects.create(
                 product=product,
                 user=request.user,
-                rating=form.cleaned_data['rating'],
-                comment=form.cleaned_data['comment']
+                rating=product_review_form.cleaned_data['rating'],
+                comment=product_review_form.cleaned_data['comment']
             )
 
     return redirect('products:detail', pk=product.id)
