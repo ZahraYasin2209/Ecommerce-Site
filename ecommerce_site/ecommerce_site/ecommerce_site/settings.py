@@ -59,7 +59,7 @@ ROOT_URLCONF = 'ecommerce_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'ecommerce_site' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,3 +131,11 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
+
+# ecommerce_site/settings.py
+
+# This tells the system that the login page is accessed via the URL pattern named 'login'.
+LOGIN_URL = 'login'
+
+# LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'orders:cart'

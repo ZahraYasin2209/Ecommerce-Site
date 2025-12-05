@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.views import View
 
+from core.utils import paginate_queryset
 from products.models import Category
 from .product_query_service import ProductQueryService
 
@@ -38,13 +39,12 @@ class ProductListView(View):
             product_queryset, sort_order
         )
 
-        products_paginator = Paginator(product_queryset, self.products_per_page)
-        current_page = products_paginator.get_page(request.GET.get("page", 1))
+        paginated_products = paginate_queryset(request, product_queryset, self.products_per_page)
 
         context = {
-            "object_list": current_page.object_list,
-            "page_obj": current_page,
-            "paginator": products_paginator,
+            "object_list": paginated_products.object_list,
+            "page_obj": paginated_products,
+            "paginator": paginated_products.paginator,
             "categories": self.product_service.get_ordered_categories_with_priority(),
             "current_category": current_category,
             "search": search_query,

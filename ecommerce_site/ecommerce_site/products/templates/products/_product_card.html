@@ -1,4 +1,3 @@
-<!--{# templates/products/_product_card.html #}-->
 <a href="{% url 'products:detail' product.pk %}" class="card product-card-white h-100 text-decoration-none">
   {% with first_image=product.images.first %}
     <div class="product-card-img-container">
