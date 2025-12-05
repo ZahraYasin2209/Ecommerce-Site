@@ -10,10 +10,10 @@ from .forms import (
 
 
 def register_user_view(request):
-    form = CustomUserCreationForm(request.POST)
+    user_register_form = CustomUserCreationForm(request.POST)
 
-    if request.method == "POST" and form.is_valid():
-        user = form.save()
+    if request.method == "POST" and user_register_form.is_valid():
+        user = user_register_form.save()
         login(request, user)
         messages.success(request, f"Account created for {user.username}! You are now logged in.")
         redirect_url = reverse('home')
@@ -21,7 +21,7 @@ def register_user_view(request):
         redirect_url = None
 
     context = {
-        'form': form
+        'form': user_register_form
     }
     return redirect(redirect_url) if redirect_url else render(request, 'users/register.html', context)
 
