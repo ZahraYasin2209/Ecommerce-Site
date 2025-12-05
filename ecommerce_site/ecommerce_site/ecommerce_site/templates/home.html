@@ -4,37 +4,94 @@
 {% block content %}
 
 <section class="hero">
-  <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-        <img src="{% static 'images/hero5.jpg' %}" class="hero-img" alt="Slide 1">
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'images/hero2.jpg' %}" class="hero-img" alt="Slide 2">
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'images/hero4.jpg' %}" class="hero-img" alt="Slide 3">
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'images/hero6.jpg' %}" class="hero-img" alt="Slide 4">
-      </div>
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+        </div>
+
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'images/hero2.jpg' %}" class="hero-img" alt="Slide 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/hero5.jpg' %}" class="hero-img" alt="Slide 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/hero3.jpg' %}" class="hero-img" alt="Slide 3">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/hero4.jpg' %}" class="hero-img" alt="Slide 4">
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+
+        <div class="hero-caption">
+            <h1 class="hero-title">Trending Articles</h1>
+            <a href="{% url 'products:category_products' 6 %}" class="hero-btn">Shop Now</a>
+        </div>
     </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-
-    <div class="hero-caption">
-      <h1 class="hero-title">Trending Articles</h1>
-      <a href="{% url 'products:category_products' 6 %}" class="hero-btn">Shop Now</a>
-    </div>
-
-  </div>
 </section>
 
+<section class="features-cards container my-5">
+    <h2 class="text-center mb-5 fw-bold features-title">Elevate Your Style. Define Your Wardrobe.</h2>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+            <div class="card feature-card feature-quality">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Premium Quality</h5>
+                    <p class="card-text text-justify">Crafted from the finest materials, our garments promise exceptional comfort and lasting style. Experience the difference in every thread.</p>
+                    <div class="text-center">
+                        <button class="btn btn-info fw-bold mt-3 px-4 py-2 rounded-pill shadow-sm feature-btn"
+                            onclick="window.location.href='{% url 'products:category_products' 6 %}'">
+                                Explore Materials →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card feature-collection">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Exclusive Collections</h5>
+                    <div class="text-justify"></div>
+                    <p class="card-text">Discover limited-edition pieces and exclusive seasonal drops crafted by leading fashion houses, at Velora, where luxury meets modern style.</p>
+                    <div class="text-center">
+                        <button class="btn btn-info fw-bold mt-3 px-4 py-2 rounded-pill shadow-sm feature-btn"
+                            onclick="window.location.href='{% url 'products:category_products' 6 %}'">
+                                View Lookbooks →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card feature-sustainable">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Consciously Made</h5>
+                    <p class="card-text">Fashion with integrity. Our commitment to sustainability means ethical sourcing and responsible production for a better future.</p>
+                    <div class="text-center">
+                        <button class="btn btn-info fw-bold mt-3 px-4 py-2 rounded-pill shadow-sm feature-btn"
+                            onclick="window.location.href='{% url 'products:category_products' 6 %}'">
+                                Learn More →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

@@ -4,7 +4,6 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
-{# Or paste CSS directly inside base.html if you're not using a separate file #}
 
 <div class="container my-4 product-detail-page">
   <div class="row">
@@ -12,9 +11,9 @@
       {% if images %}
         <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
-            {% for img in images %}
+            {% for image in images %}
             <div class="carousel-item {% if forloop.first %}active{% endif %}">
-              <img src="{{ img.url }}" class="d-block w-100 product-image" alt="{{ img.alt_text }}">
+              <img src="{{ image.url }}" class="d-block w-100 product-image" alt="{{ image.alt_text }}">
             </div>
             {% endfor %}
           </div>
@@ -71,17 +70,19 @@
       <form method="post" action="{% url 'products:add_to_cart' product.pk %}">
         {% csrf_token %}
         <div class="mb-2">
-          <label for="detail" class="form-label fw-semibold">Choose size / variant</label>
+          <label for="detail" class="form-label fw-semibold">Choose size</label>
           <select name="detail_id" id="detail" class="form-select" required>
-            {% for d in details %}
-              <option value="{{ d.pk }}">
-                {{ d.size }} — PKR {{ d.price }} —
-                {% if d.stock > 0 %}
-                  In stock ({{ d.stock }})
-                {% else %}
-                  Out of stock
+            {% for detail in details %}
+                {% if detail.size != "N/A" %}
+                    <option value="{{ detail.pk }}">
+                        {{ detail.size }} —
+                        {% if detail.stock > 0 %}
+                            In stock
+                        {% else %}
+                            Out of stock
+                        {% endif %}
+                    </option>
                 {% endif %}
-              </option>
             {% endfor %}
           </select>
         </div>
@@ -99,20 +100,43 @@
 
       <hr>
 
-      <h5 class="fw-bold mb-3">Reviews</h5>
+   <section class="review-submission mt-4">
+       <h3>Review</h3>
+       {% if user.is_authenticated %}
+        <form method="post" action="{% url 'products:add_review' product.id %}">
+          {% csrf_token %}
 
-      {% if reviews %}
+          {{ review_form.non_field_errors }}
+
+          <div class="mb-2">
+            {{ review_form.rating.label_tag }}
+            {{ review_form.rating }}
+          </div>
+
+          <div class="mb-2">
+            {{ review_form.comment.label_tag }}
+            {{ review_form.comment }}
+          </div>
+
+          <button type="submit" class="btn btn-success">Submit Review</button>
+        </form>
+       {% else %}
+       <p><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to write a review.</p>
+       {% endif %}
+   </section>
+
+        {% if reviews %}
         <div class="reviews-box">
-          {% for r in reviews %}
+          {% for review in reviews %}
             <div class="review-item">
-              <strong>{{ r.user.username }}</strong> — {{ r.rating }} / 5
-              <div>{{ r.comment }}</div>
+              <strong>{{ review.user.username }}</strong> — {{ review.rating }} / 5
+              <div>{{ review.comment }}</div>
             </div>
           {% endfor %}
         </div>
-      {% else %}
+        {% else %}
         <p class="no-reviews">No reviews yet.</p>
-      {% endif %}
+        {% endif %}
 
     </div>
   </div>

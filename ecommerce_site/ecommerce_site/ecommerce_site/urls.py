@@ -6,7 +6,9 @@ from .views import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('products/', include('products.urls', namespace='products')),
     path('', home, name='home'),
-    path("cart/", include("orders.urls", namespace="cart")),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('orders/', include('orders.urls', namespace='orders')),
+    path('products/', include('products.urls', namespace='products')),
+    path('users/', include('users.urls')),
 ]

@@ -131,3 +131,13 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
+
+# ecommerce_site/settings.py
+
+# This tells the system that the login page is accessed via the URL pattern named 'login'.
+LOGIN_URL = 'login'
+
+# It's also good practice to define where users go after they log in successfully.
+# This will redirect them to the home page (name='home' in your main urls.py).
+# LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'orders:cart'
