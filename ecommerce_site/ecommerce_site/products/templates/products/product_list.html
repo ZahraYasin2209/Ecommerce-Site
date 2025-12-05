@@ -14,9 +14,9 @@
       <h6>Categories</h6>
       <ul class="list-unstyled">
         <li><a href="{% url 'products:list' %}?search=">All</a></li>
-        {% for cat in categories %}
-          <li class="{% if current_category and cat.pk == current_category.pk %}fw-bold{% endif %}">
-            <a href="{% url 'products:category_products' cat.pk %}">{{ cat.name }}</a>
+        {% for category in categories %}
+          <li class="{% if current_category and category.pk == current_category.pk %}fw-bold{% endif %}">
+            <a href="{% url 'products:category_products' category.pk %}">{{ category.name }}</a>
           </li>
         {% endfor %}
       </ul>
@@ -56,12 +56,12 @@
           <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
           {% endif %}
 
-          {% for num in page_obj.paginator.page_range %}
-            {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
-              {% if num == page_obj.number %}
-                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% for page_num in page_obj.paginator.page_range %}
+            {% if page_num >= page_obj.number|add:-2 and page_num <= page_obj.number|add:2 %}
+              {% if page_num == page_obj.number %}
+                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
               {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}">{{ num }}</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_num }}{% if search %}&search={{ search }}{% endif %}">{{ page_num }}</a></li>
               {% endif %}
             {% endif %}
           {% endfor %}

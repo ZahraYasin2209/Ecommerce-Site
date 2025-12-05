@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Order Review</h1>
+
+    <div class="card mb-4">
+        <div class="card-header"><h4>Shipping Information</h4></div>
+        <div class="card-body">
+            <p><strong>Name:</strong> {{ shipping_address.recipient_name }}</p>
+            <p><strong>Phone:</strong> {{ shipping_address.recipient_phone_number }}</p>
+            <p><strong>Email:</strong> {{ shipping_address.recipient_email }}</p>
+            <p><strong>Address:</strong> {{ shipping_address.recipient_address }}</p>
+            <p><strong>Postal Code:</strong> {{ shipping_address.recipient_area_postal_code }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><h4>Items in Your Cart</h4></div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.product_detail.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>PKR {{ item.product_detail.price }}</td>
+                        <td>PKR {{ item.total_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><h4>Order Summary</h4></div>
+        <div class="card-body">
+            <p><strong>Subtotal:</strong> PKR {{ subtotal }}</p>
+            <p><strong>Shipping Charges:</strong> PKR {{ shipping_charge }}</p>
+            <p><strong>Total:</strong> PKR {{ total }}</p>
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <a href="{% url 'orders:checkout' %}" class="btn btn-secondary">Back to Checkout</a>
+        <form action="{% url 'orders:confirm_order' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Confirm Order</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

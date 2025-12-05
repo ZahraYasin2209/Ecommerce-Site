@@ -18,15 +18,12 @@ class ProductQueryService:
         return product_queryset.filter(category=category)
 
     def apply_search_filter(self, product_queryset, search_query):
-        if search_query:
-            product_queryset = product_queryset.filter(
-                Q(name__icontains=search_query)
-                | Q(code__icontains=search_query)
-                | Q(product_details__description__icontains=search_query)
-                | Q(product_details__material__icontains=search_query)
-            ).distinct()
-
-        return product_queryset
+        return product_queryset.filter(
+            Q(name__icontains=search_query)
+            | Q(code__icontains=search_query)
+            | Q(product_details__description__icontains=search_query)
+            | Q(product_details__material__icontains=search_query)
+        ).distinct()
 
     def filter_by_size(self, product_queryset, size_value):
         if size_value:
