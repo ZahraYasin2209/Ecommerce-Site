@@ -2,7 +2,7 @@ from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
 from .choices import (
-    DEFAULT_RATING_CHOICE, RatingChoices, SizeChoices
+    RatingChoices, SizeChoices
 )
 
 
@@ -17,9 +17,7 @@ class Product(TimeStampedModel):
     name = models.CharField(max_length=100)
     code = models.CharField(
         max_length=50,
-        unique=True,
-        null=True,
-        blank=True
+        unique=True
     )
 
     category = models.ForeignKey(
@@ -72,7 +70,7 @@ class ProductDetail(models.Model):
 
 
 class Review(models.Model):
-    rating = models.IntegerField(choices=RatingChoices.choices, default=DEFAULT_RATING_CHOICE)
+    rating = models.IntegerField(choices=RatingChoices.choices, default=RatingChoices.ONE)
     comment = models.TextField()
 
     product = models.ForeignKey(
