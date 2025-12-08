@@ -1,33 +1,33 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib import messages
-from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
+from django.contrib.auth import login
+from django.urls import (
+    reverse, reverse_lazy
+)
+from django.views.generic.edit import CreateView
 
 from .forms import (
     CustomLoginForm, CustomUserCreationForm
 )
 
 
-def register_user_view(request):
-    user_register_form = CustomUserCreationForm(request.POST)
+class RegisterUserView(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = 'users/register.html'
 
-    if request.method == "POST" and user_register_form.is_valid():
-        user = user_register_form.save()
-        login(request, user)
-        messages.success(request, f"Account created for {user.username}! You are now logged in.")
-        redirect_url = reverse('home')
-    else:
-        redirect_url = None
+    success_url = reverse_lazy('login')
 
-    context = {
-        'form': user_register_form
-    }
-    return redirect(redirect_url) if redirect_url else render(request, 'users/register.html', context)
+    def form_valid(self, form):
+        self.object = user = form.save()
+        login(self.request, user)
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'
+    template_name = 'users/login.html'
     authentication_form = CustomLoginForm
 
     def get_success_url(self):
