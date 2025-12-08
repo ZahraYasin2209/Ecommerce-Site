@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 
+from orders.constants import DEFAULT_CART_ITEMS_PRICE
 from orders.models import CartItem
 from orders.utils import get_or_create_user_cart
-from orders.constants import DEFAULT_CART_ITEMS_PRICE
 
 
 class CartDetailView(LoginRequiredMixin, ListView):
