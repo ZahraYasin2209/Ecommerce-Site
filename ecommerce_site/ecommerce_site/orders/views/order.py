@@ -108,5 +108,4 @@ class ConfirmOrderView(LoginRequiredMixin, View):
 
         cart_items.delete()
 
-        return redirect("orders:success", order_pk=order.pk)
-        
+        return redirect("orders:success", order_pk=order.pk)  
