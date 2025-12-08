@@ -61,7 +61,7 @@ class OrderSuccessView(LoginRequiredMixin, TemplateView):
 
 class ConfirmOrderView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        return redirect('orders:checkout')
+        return redirect("orders:checkout")
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
