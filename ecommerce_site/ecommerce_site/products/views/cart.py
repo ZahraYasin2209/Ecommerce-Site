@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from orders.models import Cart, CartItem
-from orders.views.utils import get_user_cart
+from orders.utils import get_or_create_user_cart
 from products.models import ProductDetail
 
 
@@ -21,7 +21,7 @@ def add_to_cart(request, product_pk):
     product_detail = get_object_or_404(ProductDetail, pk=product_detail_id)
 
     cart_item, is_created = CartItem.objects.get_or_create(
-        cart=get_user_cart(request.user),
+        cart=get_or_create_user_cart(request.user),
         product_detail=product_detail,
         defaults={"quantity": quantity_to_add}
     )
@@ -29,13 +29,15 @@ def add_to_cart(request, product_pk):
     if not is_created:
         cart_item.quantity += quantity_to_add
         cart_item.save(update_fields=["quantity"])
+    else:
+        pass
 
     return redirect(reverse("orders:cart_detail"))
 
 
 @login_required(login_url='login')
 def display_cart_contents(request):
-    user_cart = get_user_cart(request.user)
+    user_cart = get_or_create_user_cart(request.user)
 
     cart_items = user_cart.cart_items.select_related(
         "product_detail",

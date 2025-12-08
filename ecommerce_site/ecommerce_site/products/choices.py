@@ -15,5 +15,3 @@ class RatingChoices(models.IntegerChoices):
     THREE = 3, "⭐⭐⭐"
     FOUR = 4, "⭐⭐⭐⭐"
     FIVE = 5, "⭐⭐⭐⭐⭐"
-
-DEFAULT_RATING_CHOICE = RatingChoices.ONE

@@ -27,7 +27,7 @@ def register_user_view(request):
 
 
 class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'
+    template_name = 'users/login.html'
     authentication_form = CustomLoginForm
 
     def get_success_url(self):

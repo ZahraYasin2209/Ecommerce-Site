@@ -19,13 +19,6 @@ class ShippingAddressForm(forms.ModelForm):
             "recipient_email",
         ]
 
-        widgets = {
-            "recipient_name": forms.TextInput(attrs={"class": "form-control"}),
-            "recipient_phone_number": forms.TextInput(attrs={"class": "form-control"}),
-            "recipient_area_postal_code": forms.TextInput(attrs={"class": "form-control"}),
-            "recipient_address": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "recipient_email": forms.EmailInput(attrs={"class": "form-control"}),
-        }
 
 
 class CustomUserCreationForm(UserCreationForm):

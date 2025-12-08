@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'django_extensions',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -119,11 +120,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'ecommerce_site', 'static'),
 ]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -140,4 +142,3 @@ LOGIN_URL = 'login'
 # It's also good practice to define where users go after they log in successfully.
 # This will redirect them to the home page (name='home' in your main urls.py).
 # LOGIN_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = 'orders:cart'

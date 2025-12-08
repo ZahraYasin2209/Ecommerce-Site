@@ -6,8 +6,8 @@ from products.models import Product, Review
 
 
 @login_required
-def add_review(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+def add_review(request, product_pk):
+    product = get_object_or_404(Product, id=product_pk)
 
     if request.method == "POST":
         form = ReviewForm(request.POST)

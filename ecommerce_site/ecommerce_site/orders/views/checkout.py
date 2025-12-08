@@ -14,7 +14,12 @@ def checkout(request):
     if request.method == "POST" and shipping_address_form.is_valid():
         shipping_address = shipping_address_form.save(commit=False)
         shipping_address.user = request.user
-        shipping_address.save()
+
+        if saved_address:
+            shipping_address.save(update_fields=shipping_address_form.changed_data)
+        else:
+            shipping_address.save()
+
         redirect_response = redirect("orders:order_review")
 
     return redirect_response or render(
