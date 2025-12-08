@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
+from django.db.models import F
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView, View
 
@@ -95,6 +96,17 @@ class ConfirmOrderView(LoginRequiredMixin, View):
         ]
 
         order.order_items.bulk_create(order_items)
+
+        product_quantity_update = {}
+        for cart_item in cart_items:
+            product_quantity_update[cart_item.product_detail.pk] = cart_item.quantity
+
+        for product_detail_pk, decrement_quantity in product_quantity_updates.items():
+            ProductDetail.objects.filter(pk=product_detail_pk).update(
+                stock=F("stock") - decrement_quantity
+            )
+
         cart_items.delete()
 
         return redirect("orders:success", order_pk=order.pk)
+        
