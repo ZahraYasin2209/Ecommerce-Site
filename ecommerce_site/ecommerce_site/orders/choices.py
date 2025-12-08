@@ -11,4 +11,3 @@ class PaymentStatusChoices(models.TextChoices):
     PENDING = "PENDING", "Pending"
     DONE = "DONE", "Done"
     FAILED = "FAILED", "Failed"
-    

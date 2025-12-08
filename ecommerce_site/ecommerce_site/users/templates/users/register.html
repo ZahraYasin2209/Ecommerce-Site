@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load widget_tweaks %}
+{% block content %}
+<div class="login-body-bg">
+    <div class="login-page">
+        <div class="login-card">
+            <h2 class="login-title">Welcome to Velora - SignUp</h2>
+
+            <form method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-floating mb-3">
+                        {{ field|add_class:"form-control" }}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                        {% if submitted and field.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-login w-100">Register</button>
+            </form>
+
+            <p class="mt-3 text-center">
+                Already have an account? <a href="{% url 'login' %}">Log In</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

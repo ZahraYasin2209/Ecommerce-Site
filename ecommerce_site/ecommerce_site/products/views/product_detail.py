@@ -1,5 +1,7 @@
 from django.views.generic import DetailView
 
+from products.choices import SizeChoices
+from products.forms import ReviewForm
 from products.models import Product
 
 
@@ -9,21 +11,23 @@ class ProductDetailView(DetailView):
     context_object_name = "product"
     pk_url_kwarg = "pk"
 
-    def get_queryset(self):
-        return (
-            Product.objects.select_related("category")
-            .prefetch_related("product_details", "images", "reviews__user")
-        )
+
+    queryset = Product.objects.select_related("category").prefetch_related(
+        "product_details", "images", "reviews__user"
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = self.object
 
-        product_detail_items = list(product.product_details.all())
-        context["details"] = product_detail_items
-        context["default_detail"] = product_detail_items[0] if product_detail_items else None
+        product_details = list(product.product_details.all())
 
-        context["images"] = list(product.images.all())
-        context["reviews"] = product.reviews.all().order_by("-id")[:10]
+        context.update({
+            "details": product_details,
+            "default_detail": product_details[0] if product_details else None,
+            "images": list(product.images.all()),
+            "reviews": product.reviews.all().order_by("-id")[:10],
+            "review_form": ReviewForm(),
+        })
 
         return context
