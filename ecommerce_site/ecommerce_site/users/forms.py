@@ -20,7 +20,6 @@ class ShippingAddressForm(forms.ModelForm):
         ]
 
 
-
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User

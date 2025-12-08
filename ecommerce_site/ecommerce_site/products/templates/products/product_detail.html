@@ -46,8 +46,12 @@
         </h3>
 
         <div class="mb-4 d-flex gap-2 flex-wrap">
-            <span class="badge bg-secondary-subtle text-secondary py-2 fs-6 fw-semibold">Code: {{ product.code }}</span>
-            <span class="badge bg-primary-subtle text-primary py-2 fs-6 fw-semibold">Category: {{ product.category.name }}</span>
+            <span class="badge bg-secondary-subtle text-secondary py-2 fs-6 fw-semibold">
+                Code: {{ product.code }}
+            </span>
+            <span class="badge bg-primary-subtle text-primary py-2 fs-6 fw-semibold">
+                Category: {{ product.category.name }}
+            </span>
         </div>
 
         {% if default_detail %}

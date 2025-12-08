@@ -434,7 +434,6 @@ aside hr {
   box-shadow: none !important;
 }
 
-
 /* Login and SignUp Page Styling */
 .login-body-bg {
     background: linear-gradient(135deg, #1f4068 0%, #162447 100%) !important;
@@ -558,7 +557,6 @@ footer a:hover {
   margin: 0px;
 }
 
-/* Order Confirmation Page */
 .success-wrapper {
     max-width: 650px;
     margin: 60px auto;

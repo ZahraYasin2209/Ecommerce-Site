@@ -1,29 +1,38 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic.edit import UpdateView
 
 from users.forms import ShippingAddressForm
+from users.models import ShippingAddress
 
 
-@login_required(login_url='login')
-def checkout(request):
-    saved_address = request.user.shipping_address.last()
-    shipping_address_form = ShippingAddressForm(request.POST or None, instance=saved_address)
+class CheckoutView(LoginRequiredMixin, UpdateView):
+    model = ShippingAddress
+    form_class = ShippingAddressForm
+    template_name = "orders/checkout.html"
 
-    redirect_response = None
+    success_url = reverse_lazy("orders:order_review")
 
-    if request.method == "POST" and shipping_address_form.is_valid():
-        shipping_address = shipping_address_form.save(commit=False)
-        shipping_address.user = request.user
+    def get_object(self, queryset=None):
+        return self.request.user.shipping_address.last()
 
-        if saved_address:
-            shipping_address.save(update_fields=shipping_address_form.changed_data)
-        else:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["saved_address"] = self.object
+
+        return context
+
+    def form_valid(self, form):
+        shipping_address = form.save(commit=False)
+        shipping_address.user = self.request.user
+
+        is_creating_new = self.object is None
+
+        if is_creating_new:
             shipping_address.save()
+            self.object = shipping_address
+        else:
+            shipping_address.save(update_fields=form.changed_data)
 
-        redirect_response = redirect("orders:order_review")
-
-    return redirect_response or render(
-        request,
-        "orders/checkout.html",
-        {"form": shipping_address_form, "saved_address": saved_address}
-    )
+        return redirect(self.get_success_url())

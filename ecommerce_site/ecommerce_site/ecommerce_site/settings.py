@@ -126,7 +126,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'ecommerce_site', 'static'),
 ]
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -138,7 +137,3 @@ AUTH_USER_MODEL = "users.User"
 
 # This tells the system that the login page is accessed via the URL pattern named 'login'.
 LOGIN_URL = 'login'
-
-# It's also good practice to define where users go after they log in successfully.
-# This will redirect them to the home page (name='home' in your main urls.py).
-# LOGIN_REDIRECT_URL = '/'

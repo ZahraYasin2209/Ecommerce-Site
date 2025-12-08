@@ -1,4 +1,6 @@
-from .cart import add_to_cart, update_cart_item_quantity, cart_item_remove
-from .checkout import checkout
-from .order import order_review, order_success, confirm_order
-
+from .add_to_cart import AddToCartView
+from .cart_detail import CartDetailView
+from .checkout import CheckoutView
+from .order import ConfirmOrderView, OrderSuccessView, OrderReviewView
+from .remove_cart_item import CartItemRemoveView
+from .update_cart_item_quantity import CartItemUpdateView
