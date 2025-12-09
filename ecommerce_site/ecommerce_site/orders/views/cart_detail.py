@@ -3,7 +3,7 @@ from django.views.generic import ListView
 
 from orders.models import CartItem
 from orders.utils import get_or_create_user_cart
-from .constants import DEFAULT_CART_ITEMS_PRICE
+from orders.constants import DEFAULT_CART_ITEMS_PRICE
 
 
 class CartDetailView(LoginRequiredMixin, ListView):
