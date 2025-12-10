@@ -19,7 +19,6 @@ class AdminRequiredMixin(AccessMixin):
                 active_user = User.objects.get(pk=request.user.pk)
             except User.DoesNotExist:
                 authorization_response = redirect(reverse_lazy("account:login"))
-
             else:
                 if active_user.user_role != UserRoleChoices.ADMIN:
                     authorization_response = redirect(reverse_lazy("home"))
