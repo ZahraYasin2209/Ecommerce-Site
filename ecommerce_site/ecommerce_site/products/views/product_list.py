@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
-from products.models import Category, Product
 from products.choices import SizeChoices
+from products.models import Category, Product
 from .product_query_service import ProductQueryService
 
 

@@ -3,10 +3,10 @@ from django.contrib.auth.forms import (
     AuthenticationForm, UserCreationForm
 )
 
+from .choices import UserRoleChoices
 from .models import (
     ShippingAddress, User
 )
-from .choices import UserRoleChoices
 
 
 class ShippingAddressForm(forms.ModelForm):
