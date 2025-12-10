@@ -1,22 +1,27 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, reverse
+from django.views.generic.edit import CreateView
 
 from products.forms import ReviewForm
 from products.models import Product, Review
 
 
-@login_required
-def add_review(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+class AddReviewView(LoginRequiredMixin, CreateView):
+    model = Review
+    form_class = ReviewForm
 
-    if request.method == "POST":
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            Review.objects.create(
-                product=product,
-                user=request.user,
-                rating=form.cleaned_data['rating'],
-                comment=form.cleaned_data['comment']
-            )
+    def form_valid(self, form):
+        product = get_object_or_404(
+            Product, pk=self.kwargs.get("product_pk")
+        )
 
-    return redirect('products:detail', pk=product.id)
+        form.instance.product = product
+        form.instance.user = self.request.user
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "products:detail",
+            kwargs={"pk": self.kwargs.get("product_pk")}
+        )

@@ -1,84 +1,112 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
+from django.db.models import F
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import TemplateView, View
 
+from orders.constants import ORDER_SHIPPING_CHARGE
 from orders.choices import PaymentStatusChoices
 from orders.models import (
-    Order, CartItem, Payment
+    Order, CartItem, Payment, Cart
 )
+from orders.utils import get_or_create_user_cart
+from products.models import ProductDetail
 from users.models import ShippingAddress
-from .utils import get_user_cart
 
 
-@login_required
-def order_review(request):
-    shipping_address = ShippingAddress.objects.filter(user=request.user).last()
-    cart_items = CartItem.objects.filter(cart__user=request.user)
+class OrderReviewView(LoginRequiredMixin, TemplateView):
+    template_name = "orders/order_review.html"
 
-    cart_subtotal = sum(item.quantity * item.product_detail.price
-                        for item in cart_items)
-    shipping_charge = 10
-    order_total_amount = cart_subtotal + shipping_charge
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    for cart_item in cart_items:
-        cart_item.total_price = cart_item.quantity * cart_item.product_detail.price
+        shipping_address = self.request.user.shipping_address.last()
+        cart_items = CartItem.objects.filter(cart__user=self.request.user)
 
-    context = {
-        'shipping_address': shipping_address,
-        'cart_items': cart_items,
-        'subtotal': cart_subtotal,
-        'shipping_charge': shipping_charge,
-        'total': order_total_amount ,
-    }
+        cart_subtotal = sum(cart_item.quantity * cart_item.product_detail.price
+                            for cart_item in cart_items)
 
-    return render(request, 'orders/order_review.html', context)
+        for cart_item in cart_items:
+            cart_item.total_price = cart_item.quantity * cart_item.product_detail.price
 
+        context.update({
+            "shipping_address": shipping_address,
+            "cart_items": cart_items,
+            "subtotal": cart_subtotal,
+            "shipping_charge": ORDER_SHIPPING_CHARGE,
+            "total": cart_subtotal + ORDER_SHIPPING_CHARGE,
+        })
 
-@login_required
-def order_success(request, order_pk):
-    user_order = get_object_or_404(Order, pk=order_pk, user=request.user)
-    order_payment = getattr(user_order, 'payment', None)
-
-    return render(
-        request, 'orders/success.html',
-        {'order': user_order, 'payment': order_payment}
-    )
+        return context
 
 
-@login_required
-def confirm_order(request):
-    redirect_url = redirect('orders:checkout')
+class OrderSuccessView(LoginRequiredMixin, TemplateView):
+    template_name = "orders/success.html"
 
-    if request.method == 'POST':
-        user_cart = get_user_cart(request.user)
-        cart_items = user_cart.cart_items.all()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-        if cart_items.exists():
-            user_shipping_address = request.user.shipping_address.first()
+        user_order = get_object_or_404(
+            Order,
+            pk=self.kwargs.get("order_pk"),
+            user=self.request.user
+        )
 
-            if user_shipping_address:
-                total_cart_amount = sum(item.quantity * item.product_detail.price
-                                        for item in cart_items)
+        context.update({
+            "order": user_order,
+            "payment": getattr(user_order, "payment", None)
+        })
 
-                order = Order.objects.create(
-                    user=request.user,
-                    shipping_address=user_shipping_address,
-                    total_amount=total_cart_amount,
-                )
+        return context
 
-                Payment.objects.create(
-                    amount=total_cart_amount,
-                    order=order,
-                    status=PaymentStatusChoices.PENDING
-                )
 
-                for cart_item in cart_items:
-                    order.order_items.create(
-                        product_detail=cart_item.product_detail,
-                        quantity=cart_item.quantity,
-                        price_at_purchase=cart_item.product_detail.price,
-                    )
-                cart_items.delete()
+class ConfirmOrderView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        return redirect('orders:checkout')
 
-                redirect_url = redirect('orders:success', order_pk=order.pk)
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        user_cart = get_or_create_user_cart(request.user)
 
-    return redirect_url
+        cart_items = user_cart.cart_items.select_related("product_detail")
+        user_shipping_address = request.user.shipping_address.first()
+
+        total_cart_amount = sum(cart_item .quantity * cart_item .product_detail.price
+                                for cart_item in cart_items)
+
+        order = Order.objects.create(
+            user=request.user,
+            shipping_address=user_shipping_address,
+            total_amount=total_cart_amount,
+        )
+
+        Payment.objects.create(
+            amount=total_cart_amount,
+            order=order,
+            status=PaymentStatusChoices.PENDING
+        )
+
+        order_items = [
+            order.order_items.model(
+                order=order,
+                product_detail=cart_item.product_detail,
+                quantity=cart_item.quantity,
+                price_at_purchase=cart_item.product_detail.price,
+            )
+            for cart_item in cart_items
+        ]
+
+        order.order_items.bulk_create(order_items)
+
+        product_quantity_updates = {}
+        for cart_item in cart_items:
+            product_quantity_updates[cart_item.product_detail.pk] = cart_item.quantity
+
+        for product_detail_pk, decrement_quantity in product_quantity_updates.items():
+            ProductDetail.objects.filter(pk=product_detail_pk).update(
+                stock=F("stock") - decrement_quantity
+            )
+
+        cart_items.delete()
+
+        return redirect("orders:success", order_pk=order.pk)

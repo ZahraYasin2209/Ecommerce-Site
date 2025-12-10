@@ -1,8 +1,8 @@
 from django.views.generic import DetailView
 
-from products.models import Product
-from products.forms import ReviewForm
 from products.choices import SizeChoices
+from products.forms import ReviewForm
+from products.models import Product
 
 
 class ProductDetailView(DetailView):

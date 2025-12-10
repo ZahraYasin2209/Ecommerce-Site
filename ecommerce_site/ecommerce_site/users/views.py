@@ -1,43 +1,135 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
-
-from .forms import (
-    CustomLoginForm, CustomUserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView as BaseLoginView
+from django.contrib.auth.views import PasswordChangeView as DjangoPasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    UpdateView,
 )
 
-
-def register_user_view(request):
-    form = CustomUserCreationForm(request.POST)
-
-    if request.method == "POST" and form.is_valid():
-        user = form.save()
-        login(request, user)
-        messages.success(request, f"Account created for {user.username}! You are now logged in.")
-        redirect_url = reverse('home')
-    else:
-        redirect_url = None
-
-    context = {
-        'form': form
-    }
-    return redirect(redirect_url) if redirect_url else render(request, 'users/register.html', context)
+from .choices import UserRoleChoices
+from .forms import (
+    CustomLoginForm,
+    CustomUserCreationForm,
+    ShippingAddressForm,
+    UserProfileUpdateForm,
+)
+from .models import ShippingAddress, User
 
 
-class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'
+class RegisterUserView(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = "users/register.html"
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+
+        if user.user_role == UserRoleChoices.ADMIN:
+            user.is_staff = True
+
+        user.save()
+        self.object = user
+
+        login(self.request, user)
+
+        if user.user_role == UserRoleChoices.ADMIN:
+            response_redirect = redirect(reverse_lazy("dashboard:index"))
+        else:
+            response_redirect = redirect(reverse_lazy("home"))
+
+        return response_redirect
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class CustomLoginView(BaseLoginView):
     authentication_form = CustomLoginForm
+    template_name = "users/login.html"
 
-    def get_success_url(self):
-        requested_next_url = self.request.POST.get("next") or self.request.GET.get("next")
-        default_redirect_url = reverse("orders:cart_detail")
+    def form_valid(self, form):
+        user = form.get_user()
+        needs_save = False
 
-        final_redirect_url = (
-            default_redirect_url
-            if requested_next_url and "/add-to-cart/" in requested_next_url
-            else requested_next_url or default_redirect_url
+        if user.user_role == UserRoleChoices.ADMIN:
+            if not user.is_staff or not user.is_superuser:
+                user.is_staff = True
+                user.is_superuser = True
+                needs_save = True
+
+        if needs_save:
+            with transaction.atomic():
+                user.save(update_fields=["is_staff", "is_superuser"])
+
+        login(self.request, user)
+
+        if user.user_role == UserRoleChoices.ADMIN:
+            response_redirect = redirect(reverse_lazy("dashboard:index"))
+        else:
+            response_redirect = super(BaseLoginView, self).form_valid(form)
+
+        return response_redirect
+
+
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserProfileUpdateForm
+    template_name = "users/profile_update.html"
+    success_url = reverse_lazy("account:profile")
+
+    def get_object(self):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        last_shipping_address = self.request.user.shipping_address.last()
+
+        if self.request.POST:
+            context["address_form"] = ShippingAddressForm(
+                self.request.POST, instance=last_shipping_address
+            )
+        else:
+            context["address_form"] = ShippingAddressForm(instance=last_shipping_address)
+
+        context["last_address"] = last_shipping_address
+
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save()
+
+        address_form = ShippingAddressForm(
+            self.request.POST, instance=self.request.user.shipping_address.last()
         )
 
-        return final_redirect_url
+        if address_form.is_valid():
+            shipping_address = address_form.save(commit=False)
+            shipping_address.user = self.request.user
+            form_fields_to_update = list(address_form.cleaned_data.keys())
+            fields_to_save = form_fields_to_update + ['user']
+
+            shipping_address.save(update_fields=fields_to_save)
+
+        return super().form_valid(form)
+
+
+class UserPasswordChangeView(LoginRequiredMixin, SuccessMessageMixin, DjangoPasswordChangeView):
+    template_name = "users/password_change.html"
+    success_url = reverse_lazy("account:profile")
+
+    success_message = "Your password was successfully updated!"
+
+
+class ShippingAddressUpdateView(LoginRequiredMixin, UpdateView):
+    model = ShippingAddress
+    form_class = ShippingAddressForm
+    template_name = "users/address_form.html"
+    success_url = reverse_lazy("account:shipping_address")
+
+    def get_queryset(self):
+        return ShippingAddress.objects.filter(user=self.request.user)

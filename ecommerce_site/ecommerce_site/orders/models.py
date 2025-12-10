@@ -48,7 +48,7 @@ class OrderItem(models.Model):
     )
 
     def __str__(self):
-        return f"{self.product_detail.product_name} in Order {self.order.id}"
+        return f"{self.product_detail.product.name} in Order {self.order.id}"
 
 
 class Cart(TimeStampedModel):
