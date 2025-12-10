@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'users',
     'products',
     'orders',
+    'dashboard',
     'django_extensions',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -119,7 +121,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'ecommerce_site', 'static'),
@@ -135,7 +137,9 @@ AUTH_USER_MODEL = "users.User"
 # ecommerce_site/settings.py
 
 # This tells the system that the login page is accessed via the URL pattern named 'login'.
-LOGIN_URL = 'login'
+LOGIN_URL = '/users/login'
 
-# LOGIN_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = 'orders:cart'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGOUT_REDIRECT_URL = '/'

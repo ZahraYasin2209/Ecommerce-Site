@@ -1,0 +1,58 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<div class="mb-4 border-bottom pb-3">
+    <h3 class="text-dark d-inline-block">
+        <i class="fa-solid fa-boxes me-2" style="color: var(--highlight-color);"></i> Product Management
+    </h3>
+
+    <a href="{% url 'dashboard:product_add' %}" class="btn btn-primary shadow-sm float-end">
+        <i class="fa-solid fa-plus me-1"></i> Add New Product
+    </a>
+</div>
+
+<div class="clearfix"></div>
+
+
+<div class="card shadow-sm border-0 rounded-3 mt-4">
+    <div class="card-body p-0">
+
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="text-secondary small fw-bold ps-4">ID</th>
+                    <th class="text-secondary small fw-bold">Name</th>
+                    <th class="text-secondary small fw-bold">Category</th>
+                    <th class="text-secondary small fw-bold">Code</th>
+                    <th class="text-secondary small fw-bold">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td class="ps-4">{{ product.pk }}</td>
+                    <td>{{ product.name }}</td>
+                    <td><span class="badge bg-secondary">{{ product.category.name }}</span></td>
+                    <td><code class="text-muted">{{ product.code }}</code></td>
+                    <td>
+                        <a href="{% url 'dashboard:product_edit' pk=product.pk %}" class="btn btn-sm btn-success me-2">
+                            <i class="fa-solid fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'dashboard:product_delete' pk=product.pk %}" class="btn btn-sm btn-danger">
+                            <i class="fa-solid fa-trash"></i> Remove
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-5">
+                        <i class="fa-solid fa-box-open fa-2x mb-2 d-block"></i>
+                        No products found. Click "Add New Product" to get started.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
