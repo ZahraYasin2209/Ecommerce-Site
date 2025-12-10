@@ -1,22 +1,24 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 
-from products.models import Category
+from products.models import Category, Product
+from products.choices import SizeChoices
 from .product_query_service import ProductQueryService
 
 
 class ProductListView(ListView):
-    model = Category
+    model = Product
     template_name = "products/product_list.html"
 
     paginate_by = 12
 
-    context_object_name = "products"
+    context_object_name = "object_list"
     product_query_service = ProductQueryService()
 
     def get_current_category(self):
+        category_id = self.kwargs.get("category_id") or self.request.GET.get("category_id")
+
         if not hasattr(self, "current_category"):
-            category_id = self.kwargs.get("category_id")
             product_category = (
                 get_object_or_404(Category, pk=category_id)
                 if category_id else None
@@ -30,8 +32,11 @@ class ProductListView(ListView):
         product_queryset = self.product_query_service.get_base_queryset()
 
         search_query = self.request.GET.get("search", "").strip()
-        selected_product_size = self.request.GET.get("size")
+        selected_product_size = self.request.GET.getlist("size")
         sort_order = self.request.GET.get("order", "newest")
+
+        product_min_price = self.request.GET.get("min_price")
+        product_max_price = self.request.GET.get("max_price")
 
         current_category = self.get_current_category()
 
@@ -39,6 +44,10 @@ class ProductListView(ListView):
             product_queryset = self.product_query_service.filter_by_category(
                 product_queryset, current_category
             )
+
+        product_queryset = self.product_query_service.apply_price_filter(
+            product_queryset, product_min_price, product_max_price
+        )
 
         product_queryset = self.product_query_service.apply_search_filter(
             product_queryset, search_query
@@ -54,7 +63,7 @@ class ProductListView(ListView):
             product_queryset, sort_order
         )
 
-        return product_queryset
+        return product_queryset.distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -64,7 +73,8 @@ class ProductListView(ListView):
             "current_category": self.get_current_category(),
             "search": self.request.GET.get("search", "").strip(),
             "order": self.request.GET.get("order", "newest"),
-            "size": self.request.GET.get("size"),
+            "size": self.request.GET.getlist("size"),
+            "size_choices": SizeChoices.choices,
         })
 
         return context

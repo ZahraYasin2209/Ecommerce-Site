@@ -434,6 +434,83 @@ aside hr {
   box-shadow: none !important;
 }
 
+/* Filters Styling */
+.size-label {
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-check:checked + .size-label {
+    color: white !important;
+    background-color: #212529 !important;
+    border-color: #212529 !important;
+}
+
+.slider-colored {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider-colored::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right,
+        #007bff 0%,
+        #007bff var(--value-percent, 0%),
+        #ccc var(--value-percent, 0%),
+        #ccc 100%
+    );
+}
+
+.slider-colored::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    /* FIX for Firefox equivalent */
+    background: linear-gradient(to right,
+        #007bff 0%,
+        #007bff var(--value-percent, 0%),
+        #ddd var(--value-percent, 0%),
+        #ddd 100%
+    );
+}
+
+.slider-colored::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    margin-top: -4px;
+}
+
+.slider-colored::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+}
+
 /* Login and SignUp Page Styling */
 .login-body-bg {
     background: linear-gradient(135deg, #1f4068 0%, #162447 100%) !important;
