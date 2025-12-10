@@ -1,7 +1,6 @@
 import json
 import os
 from decimal import Decimal, InvalidOperation
-from pathlib import Path
 
 from django.core.management.base import (
     BaseCommand, CommandError
@@ -54,15 +53,19 @@ class Command(BaseCommand):
                 if product_material.upper() in product_material_details
             ),
             "N/A"
-        )
+    )
 
     def handle(self, *args, **options):
+        json_file_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "data",
+            "clothes.json"
+        )
+
+        self.stdout.write(f"Starting product data import from {json_file_path}")
+
         try:
-            with open(
-                    Path(os.path.abspath(__file__)).parent.parent / "data" / "clothes.json",
-                    "r",
-                    encoding="utf-8"
-            ) as json_file:
+            with open(json_file_path, "r", encoding="utf-8") as json_file:
                 product_data_list = json.load(json_file)
         except json.JSONDecodeError:
             raise CommandError(

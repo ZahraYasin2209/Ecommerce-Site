@@ -1,0 +1,22 @@
+<a href="{% url 'products:detail' product.pk %}" class="card product-card-white h-100 text-decoration-none">
+  {% with first_image=product.images.first %}
+    <div class="product-card-img-container">
+      {% if first_image %}
+        <img src="{{ first_image.url }}" class="card-img-top product-card-image" alt="{{ product.name }}">
+      {% else %}
+        <div class="product-card-no-image">No Image</div>
+      {% endif %}
+    </div>
+  {% endwith %}
+
+  <div class="card-body">
+    <h5 class="card-title text-dark fw-bold mb-1">{{ product.name }}</h5>
+    {% if product.min_price %}
+      <p class="card-text text-primary fw-bolder">PKR {{ product.min_price }}</p>
+    {% elif product.product_details.exists %}
+      <p class="card-text text-primary fw-bolder">PKR {{ product.product_details.first.price }}</p>
+    {% else %}
+      <p class="card-text text-muted">Price TBD</p>
+    {% endif %}
+  </div>
+</a>

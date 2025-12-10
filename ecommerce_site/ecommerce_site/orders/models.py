@@ -41,14 +41,14 @@ class OrderItem(models.Model):
         related_name="order_items"
     )
 
-    product = models.ForeignKey(
-        "products.Product",
+    product_detail = models.ForeignKey(
+        "products.ProductDetail",
         on_delete=models.CASCADE,
         related_name="order_items",
     )
 
     def __str__(self):
-        return f"{self.product.product_name} in Order {self.order.id}"
+        return f"{self.product_detail.product.name} in Order {self.order.id}"
 
 
 class Cart(TimeStampedModel):
@@ -61,10 +61,10 @@ class Cart(TimeStampedModel):
 class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
 
-    product = models.ForeignKey(
-        "products.Product",
+    product_detail = models.ForeignKey(
+        "products.ProductDetail",
         on_delete=models.CASCADE,
-        related_name="cart_items"
+        related_name="cart_items",
     )
 
     cart = models.ForeignKey(
@@ -74,7 +74,7 @@ class CartItem(models.Model):
     )
 
     def __str__(self):
-        return f"{self.product.name} with quantity {self.quantity}"
+        return f"{self.product_detail.product.name} with quantity {self.quantity}"
 
 
 class Payment(TimeStampedModel):

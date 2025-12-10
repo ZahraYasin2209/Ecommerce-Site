@@ -17,7 +17,7 @@ class Product(TimeStampedModel):
     name = models.CharField(max_length=100)
     code = models.CharField(
         max_length=50,
-        unique=True,
+        unique=True
     )
 
     category = models.ForeignKey(
@@ -43,15 +43,19 @@ class ProductImage(TimeStampedModel):
     )
 
     def __str__(self):
-        return f"Image {self.image} for {self.product.name}"
+        return f"Image {self.url} for {self.product.name}"
 
 
 class ProductDetail(models.Model):
-    size = models.CharField(max_length=20, choices=SizeChoices.choices)
+    size = models.CharField(
+        max_length=20,
+        choices=SizeChoices.choices,
+        default=SizeChoices.M
+    )
     material = models.CharField(max_length=50)
     color = models.CharField(max_length=50)
 
-    stock = models.PositiveIntegerField()
+    stock = models.PositiveIntegerField(default=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
 
@@ -66,7 +70,9 @@ class ProductDetail(models.Model):
 
 
 class Review(models.Model):
-    rating = models.IntegerField(choices=RatingChoices.choices)
+    rating = models.IntegerField(
+        choices=RatingChoices.choices, default=RatingChoices.ONE
+    )
     comment = models.TextField()
 
     product = models.ForeignKey(

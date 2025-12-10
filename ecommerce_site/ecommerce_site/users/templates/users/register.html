@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="login-body-bg">
+    <div class="login-page">
+        <div class="login-card">
+            <h2 class="login-title">Welcome to Velora - SignUp</h2>
+
+            <form method="post" action="{% url 'account:register' %}">
+                {% csrf_token %}
+
+                {# Display Non-Field Errors (Global errors like password mismatch) #}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger small mb-3">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    {% if field.name != 'user_role' %}
+                        <div class="form-floating mb-3">
+                            {{ field|add_class:"form-control" }}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="mb-3">
+                    <label for="{{ form.user_role.id_for_label }}" class="form-label fw-semibold">
+                        Sign up as:
+                    </label>
+                    {{ form.user_role|add_class:"form-select" }}
+                    {% if form.user_role.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.user_role.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn-login w-100">Register</button>
+            </form>
+
+            <p class="mt-3 text-center">
+                Already have an account? <a href="{% url 'account:login' %}">Log In</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
