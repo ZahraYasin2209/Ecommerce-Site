@@ -98,9 +98,9 @@ class ConfirmOrderView(LoginRequiredMixin, View):
 
         order.order_items.bulk_create(order_items)
 
-        product_quantity_update = {}
+        product_quantity_updates = {}
         for cart_item in cart_items:
-            product_quantity_update[cart_item.product_detail.pk] = cart_item.quantity
+            product_quantity_updates[cart_item.product_detail.pk] = cart_item.quantity
 
         for product_detail_pk, decrement_quantity in product_quantity_updates.items():
             ProductDetail.objects.filter(pk=product_detail_pk).update(
@@ -109,4 +109,4 @@ class ConfirmOrderView(LoginRequiredMixin, View):
 
         cart_items.delete()
 
-        return redirect("orders:success", order_pk=order.pk)  
+        return redirect("orders:success", order_pk=order.pk)

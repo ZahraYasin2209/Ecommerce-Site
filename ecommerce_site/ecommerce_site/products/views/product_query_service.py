@@ -39,19 +39,12 @@ class ProductQueryService:
         return product_queryset
 
     def validate_product_price(
-            self, price_str, product_default_value, min_constraint, max_constraint
+            self, product_price, default_product_price
     ):
-        validated_product_price = product_default_value
-
         try:
-            potential_price = Decimal(price_str)
-            validated_product_price = max(
-                min_constraint, min(
-                    potential_price, max_constraint
-                )
-            )
+            validated_product_price = Decimal(product_price)
         except (InvalidOperation, TypeError):
-            pass
+            validated_product_price = default_product_price
 
         return validated_product_price
 
@@ -60,15 +53,11 @@ class ProductQueryService:
         min_product_price = self.validate_product_price(
             min_product_price,
             DEFAULT_MIN_PRICE,
-            DEFAULT_MIN_PRICE,
-            DEFAULT_MAX_PRICE
         )
 
         max_product_price = self.validate_product_price(
             max_product_price,
             DEFAULT_MAX_PRICE,
-            DEFAULT_MIN_PRICE,
-            DEFAULT_MAX_PRICE
         )
 
         queryset = queryset.filter(

@@ -13,5 +13,5 @@ urlpatterns = [
     path("checkout/", views.CheckoutView.as_view(), name="checkout"),
     path("review/", views.OrderReviewView.as_view(), name="order_review"),
     path("orders/confirm/", views.ConfirmOrderView.as_view(), name="confirm_order"),
-    path("success/<int:order_pk>/", views.OrderSuccessView.as_view(), name="success"),
+    path("success/<int:order_pk>/", views.OrderSuccessView.as_view(), name="order_success"),
 ]

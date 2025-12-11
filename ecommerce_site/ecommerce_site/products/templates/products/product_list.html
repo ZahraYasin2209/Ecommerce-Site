@@ -8,7 +8,7 @@
     <div class="row">
         <aside class="col-md-3">
 
-            <form method="get" action="{% url 'products:list' %}" class="mb-3">
+            <form method="get" action="{% url 'products:product_list' %}" class="mb-3">
                 <div class="input-group">
                     <input class="form-control" name="search" placeholder="Search products..." value="{{ search }}">
                     <button class="btn btn-outline-secondary">Search</button>
@@ -19,7 +19,7 @@
             <ul class="list-unstyled">
                 {% with current_params_all=request.GET.urlencode|cut:'page='|cut:'&page='|cut:'category_id='|cut:'&category_id='|cut:'search='|cut:'&search=' %}
                 <li>
-                    <a href="{% url 'products:list' %}?{{ current_params_all|cut:'category='|cut:'&category=' }}">All</a>
+                    <a href="{% url 'products:product_list' %}?{{ current_params_all|cut:'category='|cut:'&category=' }}">All</a>
                 </li>
 
                 {% for category in categories %}
@@ -60,7 +60,7 @@
             <hr>
 
             <h4>Filters</h4>
-            <form method="get" action="{% url 'products:list' %}" class="mb-4" id="filter-form">
+            <form method="get" action="{% url 'products:product_list' %}" class="mb-4" id="filter-form">
                 {% if current_category %}
                     <input type="hidden" name="category_id" value="{{ current_category.pk }}">
                 {% endif %}
@@ -118,7 +118,7 @@
                 Clear All Filters
             </a>
             {% else %}
-            <a href="{% url 'products:list' %}" class="btn btn-outline-danger btn-sm w-100 mt-2">
+            <a href="{% url 'products:product_list' %}" class="btn btn-outline-danger btn-sm w-100 mt-2">
                 Clear All Filters
             </a>
             {% endif %}

@@ -96,7 +96,7 @@
                         <a href="{% url 'orders:checkout' %}" class="btn btn-success btn-lg fw-bold rounded-pill shadow-sm">
                             Proceed to Checkout
                         </a>
-                        <a href="{% url 'products:list' %}" class="btn btn-secondary w-100 rounded-pill">
+                        <a href="{% url 'products:product_list' %}" class="btn btn-secondary w-100 rounded-pill">
                             Continue Shopping
                         </a>
                     </div>
@@ -109,7 +109,7 @@
         <h4 class="alert-heading">Your Shopping Cart is Empty!</h4>
         <p class="lead">Looks like you haven't added anything yet.</p>
         <hr>
-        <a href="{% url 'products:list' %}" class="btn btn-primary btn-lg mt-2">Start Shopping Now</a>
+        <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg mt-2">Start Shopping Now</a>
     </div>
     {% endif %}
 </div>

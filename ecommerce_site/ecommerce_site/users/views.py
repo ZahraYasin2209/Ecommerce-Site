@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import PasswordChangeView as DjangoPasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -30,6 +29,7 @@ class RegisterUserView(CreateView):
 
         if user.user_role == UserRoleChoices.ADMIN:
             user.is_staff = True
+            user.is_superuser = True
 
         user.save()
         self.object = user
@@ -53,17 +53,6 @@ class CustomLoginView(BaseLoginView):
 
     def form_valid(self, form):
         user = form.get_user()
-        needs_save = False
-
-        if user.user_role == UserRoleChoices.ADMIN:
-            if not user.is_staff or not user.is_superuser:
-                user.is_staff = True
-                user.is_superuser = True
-                needs_save = True
-
-        if needs_save:
-            with transaction.atomic():
-                user.save(update_fields=["is_staff", "is_superuser"])
 
         login(self.request, user)
 
@@ -88,16 +77,12 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        last_shipping_address = self.request.user.shipping_address.last()
+        context["address_form"] = ShippingAddressForm(
+            self.request.POST or None,
+            instance=self.request.user.shipping_address.last()
+        )
 
-        if self.request.POST:
-            context["address_form"] = ShippingAddressForm(
-                self.request.POST, instance=last_shipping_address
-            )
-        else:
-            context["address_form"] = ShippingAddressForm(instance=last_shipping_address)
-
-        context["last_address"] = last_shipping_address
+        context["last_address"] = self.request.user.shipping_address.last()
 
         return context
 
@@ -112,11 +97,13 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
             shipping_address = address_form.save(commit=False)
             shipping_address.user = self.request.user
 
-            fields_to_save = list(address_form.cleaned_data.keys()) + ["user"]
+            shipping_address.save(update_fields=list(address_form.cleaned_data.keys()) + ["user"])
+            final_response = super().form_valid(form)
+        else:
+            context = self.get_context_data(form=form, address_form=address_form)
+            final_response = self.render_to_response(context)
 
-            shipping_address.save(update_fields=fields_to_save)
-
-        return super().form_valid(form)
+        return final_response
 
 
 class UserPasswordChangeView(LoginRequiredMixin, SuccessMessageMixin, DjangoPasswordChangeView):
@@ -130,6 +117,3 @@ class ShippingAddressUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "users/address_form.html"
 
     success_url = reverse_lazy("account:shipping_address")
-
-    def get_queryset(self):
-        return ShippingAddress.objects.filter(user=self.request.user)
