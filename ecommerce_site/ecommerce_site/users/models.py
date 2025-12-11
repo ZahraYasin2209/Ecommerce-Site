@@ -8,7 +8,7 @@ from .choices import UserRoleChoices
 class User(TimeStampedModel, AbstractUser):
     email = models.EmailField(max_length=100, unique=True)
     profile_picture = models.ImageField(
-        upload_to="profile_pics/",
+        upload_to="profile_pics/%Y/%m/",
         blank=True,
         null=True,
         verbose_name="Profile Picture"

@@ -69,7 +69,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserProfileUpdateForm
     template_name = "users/profile_update.html"
 
-    success_url = reverse_lazy("account:profile")
+    success_url = reverse_lazy("account:user_profile")
 
     def get_object(self):
         return self.request.user
@@ -89,19 +89,24 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         self.object = form.save()
 
+        address_instance = self.request.user.shipping_address.last()
+
         address_form = ShippingAddressForm(
-            self.request.POST, instance=self.request.user.shipping_address.last()
+            self.request.POST, instance=address_instance
         )
+
+        final_response = super().form_valid(form)
 
         if address_form.is_valid():
             shipping_address = address_form.save(commit=False)
             shipping_address.user = self.request.user
 
-            shipping_address.save(update_fields=list(address_form.cleaned_data.keys()) + ["user"])
-            final_response = super().form_valid(form)
-        else:
-            context = self.get_context_data(form=form, address_form=address_form)
-            final_response = self.render_to_response(context)
+            if address_instance and address_instance.pk:
+                shipping_address.save(
+                    update_fields=list(address_form.cleaned_data.keys()) + ["user"]
+                )
+            else:
+                shipping_address.save()
 
         return final_response
 

@@ -16,7 +16,7 @@ class ProductListView(ListView):
     product_query_service = ProductQueryService()
 
     def get_current_category(self):
-        category_id = self.kwargs.get("category_id") or self.request.GET.get("category_id")
+        category_id = self.kwargs.get("pk") or self.request.GET.get("category_id")
 
         if not hasattr(self, "current_category"):
             product_category = (

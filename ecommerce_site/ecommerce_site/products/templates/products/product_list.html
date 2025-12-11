@@ -17,7 +17,7 @@
 
             <h6>Categories</h6>
             <ul class="list-unstyled">
-                {% with current_params_all=request.GET.urlencode|cut:'page='|cut:'&page='|cut:'category_id='|cut:'&category_id='|cut:'search='|cut:'&search=' %}
+                {% with current_params_all=request.GET.urlencode|cut:'page='|cut:'&page='|cut:'pk='|cut:'&pk='|cut:'search='|cut:'&search=' %}
                 <li>
                     <a href="{% url 'products:product_list' %}?{{ current_params_all|cut:'category='|cut:'&category=' }}">All</a>
                 </li>
@@ -62,11 +62,11 @@
             <h4>Filters</h4>
             <form method="get" action="{% url 'products:product_list' %}" class="mb-4" id="filter-form">
                 {% if current_category %}
-                    <input type="hidden" name="category_id" value="{{ current_category.pk }}">
+                    <input type="hidden" name="pk" value="{{ current_category.pk }}">
                 {% endif %}
 
                 {% for parameter_key, value in request.GET.items %}
-                    {% if parameter_key != "min_price" and parameter_key != "max_price" and parameter_key != "size" and parameter_key != "page" and parameter_key != "category_id" %}
+                    {% if parameter_key != "min_price" and parameter_key != "max_price" and parameter_key != "size" and parameter_key != "page" and parameter_key != "pk" %}
                         {% for hidden_value in request.GET.getlist.key %}
                             <input type="hidden" name="{{ parameter_key }}" value="{{ hidden_value }}">
                         {% endfor %}
