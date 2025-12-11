@@ -35,7 +35,7 @@
                     </span></td>
                     <td><code class="text-muted">{{ product.code }}</code></td>
                     <td>
-                        <a href="{% url 'dashboard:product_edit' pk=product.pk %}" class="btn btn-sm btn-success me-2">
+                        <a href="{% url 'dashboard:product_update' pk=product.pk %}" class="btn btn-sm btn-success me-2">
                             <i class="fa-solid fa-edit"></i> Edit
                         </a>
                         <a href="{% url 'dashboard:product_delete' pk=product.pk %}" class="btn btn-sm btn-danger">

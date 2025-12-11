@@ -29,7 +29,7 @@
                     <td class="ps-4">{{ category.pk }}</td>
                     <td>{{ category.name }}</td>
                     <td>
-                        <a href="{% url 'dashboard:category_edit' pk=category.pk %}"
+                        <a href="{% url 'dashboard:category_update' pk=category.pk %}"
                            class="btn btn-sm btn-success me-2">
                             <i class="fa-solid fa-edit"></i> Edit
                         </a>
