@@ -3,7 +3,8 @@ import os
 from decimal import Decimal, InvalidOperation
 
 from django.core.management.base import (
-    BaseCommand, CommandError
+    BaseCommand,
+    CommandError
 )
 from django.db import transaction
 
@@ -16,7 +17,6 @@ from products.models import (
 )
 from .mappings import (
     CATEGORY_MAPPING,
-    DEFAULT_SIZE,
     DEFAULT_STOCK,
     PRODUCT_MATERIALS
 )
