@@ -49,7 +49,6 @@ class ProductQueryService:
         return validated_product_price
 
     def apply_price_filter(self, queryset, min_product_price, max_product_price):
-
         min_product_price = self.validate_product_price(
             min_product_price,
             DEFAULT_MIN_PRICE,
