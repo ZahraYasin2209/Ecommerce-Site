@@ -10,8 +10,8 @@ class SizeChoices(models.TextChoices):
 
 
 class RatingChoices(models.IntegerChoices):
-    ONE = 1, "1 Star"
-    TWO = 2, "2 Stars"
-    THREE = 3, "3 Stars"
-    FOUR = 4, "4 Stars"
-    FIVE = 5, "5 Stars"
+    ONE = 1, "⭐"
+    TWO = 2, "⭐⭐"
+    THREE = 3, "⭐⭐⭐"
+    FOUR = 4, "⭐⭐⭐⭐"
+    FIVE = 5, "⭐⭐⭐⭐⭐"

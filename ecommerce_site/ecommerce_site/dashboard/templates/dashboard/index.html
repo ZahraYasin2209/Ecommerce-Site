@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<h2 class="mb-4 text-dark border-bottom pb-2">
+    <i class="fa-solid fa-gauge me-2 text-primary"></i> Dashboard Overview
+</h2>
+<p class="text-muted">
+    Hello, <strong>{{ request.user.username }}</strong>! Quick overview of system metrics.
+</p>
+
+<div class="row mt-4 g-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card bg-primary text-white mb-3 shadow-lg" style="background-color: #3498db !important;">
+            <div class="card-body">
+                <h5 class="card-title">Total Products</h5>
+                <p class="card-text fs-2 fw-bold">{{ total_products }}</p>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'dashboard:product_list' %}" class="btn btn-sm text-primary w-100 fw-bold" style="color: #3498db !important;">
+                    <i class="fa-solid fa-eye me-1"></i> View Products
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card bg-success text-white mb-3 shadow-lg" style="background-color: #198754 !important;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Total Categories
+                </h5>
+                <p class="card-text fs-2 fw-bold">{{ total_categories }}</p>
+            </div>
+
+            <div class="card-footer bg-light">
+                <a href="{% url 'dashboard:category_list' %}"
+                   class="btn btn-sm text-success w-100 fw-bold" style="color: #198754 !important;">
+                    <i class="fa-solid fa-eye me-1"></i> View Categories
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,7 +1,6 @@
 import json
 import os
 from decimal import Decimal, InvalidOperation
-from pathlib import Path
 
 from django.core.management.base import (
     BaseCommand, CommandError
@@ -17,7 +16,6 @@ from products.models import (
 )
 from .mappings import (
     CATEGORY_MAPPING,
-    DEFAULT_SIZE,
     DEFAULT_STOCK,
     PRODUCT_MATERIALS
 )
@@ -54,15 +52,19 @@ class Command(BaseCommand):
                 if product_material.upper() in product_material_details
             ),
             "N/A"
-        )
+    )
 
     def handle(self, *args, **options):
+        json_file_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "data",
+            "clothes.json"
+        )
+
+        self.stdout.write(f"Starting product data import from {json_file_path}")
+
         try:
-            with open(
-                    Path(os.path.abspath(__file__)).parent.parent / "data" / "clothes.json",
-                    "r",
-                    encoding="utf-8"
-            ) as json_file:
+            with open(json_file_path, "r", encoding="utf-8") as json_file:
                 product_data_list = json.load(json_file)
         except json.JSONDecodeError:
             raise CommandError(
@@ -71,6 +73,8 @@ class Command(BaseCommand):
 
         total_products_counter = len(product_data_list)
         success_imports_counter = 0
+
+        product_details_to_create = []
 
         with transaction.atomic():
             for product_json_record in product_data_list:
@@ -122,17 +126,17 @@ class Command(BaseCommand):
                         "product_info", []
                     )
 
-                    ProductDetail.objects.update_or_create(
-                        product=product_instance,
-                        defaults={
-                            "size": DEFAULT_SIZE,
-                            "material": self.get_product_material(product_info_list),
-                            "color": product_info_list[0] if product_info_list else "N/A",
-                            "stock": DEFAULT_STOCK,
-                            "price": product_price,
-                            "description": "\n".join(product_info_list),
-                        }
-                    )
+                    for size_value, _ in SizeChoices.choices:
+                        product_detail = ProductDetail(
+                            product=product_instance,
+                            size=size_value,
+                            material=self.get_product_material(product_info_list),
+                            color=product_info_list[0] if product_info_list else "N/A",
+                            stock=DEFAULT_STOCK,
+                            price=product_price,
+                            description="\n".join(product_info_list),
+                        )
+                        product_details_to_create.append(product_detail)
 
                     for image_index, image_source_url in enumerate(
                         product_json_record.get("product_images", [])
@@ -161,6 +165,8 @@ class Command(BaseCommand):
                             f"Error: {error}"
                         )
                     )
+        if product_details_to_create:
+            ProductDetail.objects.bulk_create(product_details_to_create)
 
         self.stdout.write("\n")
         self.stdout.write(

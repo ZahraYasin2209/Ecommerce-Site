@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5 py-3 product-detail-page">
+  <div class="row g-5">
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        {% if images %}
+          <div id="productCarousel" class="carousel slide" data-bs-ride="carousel"
+               style="height: 550px; background-color: #f8f9fa;"> <div class="carousel-inner h-100">
+              {% for image in images %}
+              <div class="carousel-item h-100 {% if forloop.first %}active{% endif %}">
+                <img src="{{ image.url }}" class="d-block w-100 h-100"
+                     style="object-fit: contain;"
+                     alt="{{ image.alt_text }}">
+              </div>
+              {% endfor %}
+            </div>
+
+            <button class="carousel-control-prev bg-dark opacity-50 rounded-start-4"
+                    type="button" data-bs-target="#productCarousel" data-bs-slide="prev"
+                    style="width: 10%;">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next bg-dark opacity-50 rounded-end-4"
+                    type="button" data-bs-target="#productCarousel" data-bs-slide="next"
+                    style="width: 10%;">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        {% else %}
+          <div class="border p-5 text-center rounded bg-light" style="height: 550px;">
+              <h4 class="text-muted">No Image Available</h4>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+        <h3 class="product-title fw-bold text-dark mb-2">
+            {{ product.name }}
+        </h3>
+
+        <div class="mb-4 d-flex gap-2 flex-wrap">
+            <span class="badge bg-secondary-subtle text-secondary py-2 fs-6 fw-semibold">
+                Code: {{ product.code }}
+            </span>
+            <span class="badge bg-primary-subtle text-primary py-2 fs-6 fw-semibold">
+                Category: {{ product.category.name }}
+            </span>
+        </div>
+
+        {% if default_detail %}
+          <h3 class="product-price display-6 fw-bolder text-danger mb-1">
+              PKR {{ default_detail.price }}
+          </h3>
+
+          <div class="d-flex gap-2 flex-wrap mb-4">
+              {% if product.color %}
+              <span class="badge bg-info-subtle text-info py-2">Color: {{ product.color }}</span>
+              {% endif %}
+              {% if product.type %}
+              <span class="badge bg-info-subtle text-info py-2">Type: {{ product.type }}</span>
+              {% endif %}
+              {% if product.collection %}
+              <span class="badge bg-info-subtle text-info py-2">Collection: {{ product.collection }}</span>
+              {% endif %}
+              {% if product.material %}
+              <span class="badge bg-info-subtle text-info py-2">Material: {{ product.material }}</span>
+              {% endif %}
+          </div>
+
+         <div class="product-description pt-1 text-muted small p-3 border-start border-3 border-secondary rounded-end-3">
+             <h5 class="fw-bold text-dark mb-2">Product Description</h5>
+             {{ default_detail.description|linebreaks }}
+         </div>
+
+        {% else %}
+          <h3 class="product-price text-muted">Price: N/A</h3>
+        {% endif %}
+
+        <hr class="my-4">
+
+        <form method="post" action="{% url 'products:add_to_cart' product.pk %}">
+          {% csrf_token %}
+
+          <div class="mb-4">
+              <label class="form-label fw-bold text-dark">Choose size</label>
+              <div class="btn-group d-flex flex-wrap" role="group" aria-label="Size options">
+                  {% for detail in details %}
+                  {% if detail.size != "N/A" %}
+                      <input type="radio" class="btn-check" name="detail_id" id="size{{ detail.pk }}"
+                             value="{{ detail.pk }}" autocomplete="off" {% if forloop.first %}checked{% endif %}>
+                      <label class="btn btn-outline-dark m-1 {% if detail.stock == 0 %}disabled text-danger{% endif %}"
+                             for="size{{ detail.pk }}">
+                          {{ detail.size }}
+                          {% if detail.stock == 0 %}
+                              <span class="small">(Out of stock)</span>
+                          {% endif %}
+                      </label>
+                  {% endif %}
+                  {% endfor %}
+              </div>
+          </div>
+
+          <div class="row align-items-center mb-5">
+              <div class="col-4">
+                  <label for="quantity" class="form-label fw-bold text-dark mb-0">Quantity</label>
+                  <input type="number" name="quantity" id="quantity" min="1" value="1"
+                         class="form-control text-center quantity-box w-100" style="max-width: 100px;">
+              </div>
+              <div class="col-8">
+                  <button class="btn btn-success btn-lg add-cart-btn w-100 fw-bold shadow-sm" type="submit">
+                      <i class="bi bi-cart-plus me-2"></i> Add to Cart
+                  </button>
+              </div>
+          </div>
+      </form>
+
+      <hr class="my-4">
+
+      <section class="review-submission mt-4">
+          <h4 class="fw-bold mb-2 pb-2">Customer Reviews</h4>
+
+          {% if user.is_authenticated %}
+           <form method="post" action="{% url 'products:add_review' product.id %}" class="mb-4 p-3 bg-light rounded-3 shadow-sm">
+             {% csrf_token %}
+             <h6 class="fw-bold mb-3">Submit Your Review</h6>
+
+             {{ review_form.non_field_errors }}
+
+             <div class="mb-3">
+               <label for="{{ review_form.rating.id_for_label }}" class="form-label fw-semibold">Rating</label>
+               {{ review_form.rating }}
+             </div>
+
+             <div class="mb-3">
+               <label for="{{ review_form.comment.id_for_label }}" class="form-label fw-semibold">Comment</label>
+               {{ review_form.comment }}
+             </div>
+
+             <button type="submit" class="btn btn-primary text-white fw-semibold">Submit Review</button>
+           </form>
+          {% else %}
+          <p class="alert alert-info border-0">
+            <i class="bi bi-info-circle me-2"></i>
+            <a href="{% url 'account:login' %}?next={{ request.path }}" class="alert-link fw-bold">Log in</a> to write a review.
+          </p>
+          {% endif %}
+      </section>
+
+      {% if reviews %}
+      <div class="reviews-box mt-4 border-top pt-3">
+          <h5 class="fw-bold mb-3">What Others Say:</h5>
+          {% for review in reviews %}
+          <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body p-3">
+              <strong class="text-primary">{{ review.user.username }}</strong>
+              <span class="badge bg-warning text-dark me-2">{{ review.rating }} / 5</span>
+              <span class="text-muted small"> {{ review.created_at|date:"M d, Y" }}</span>
+              <p class="mt-2 mb-0 small text-dark">{{ review.comment }}</p>
+            </div>
+          </div>
+          {% endfor %}
+      </div>
+      {% else %}
+      <p class="no-reviews text-muted fst-italic">No reviews yet. Be the first to share your thoughts!</p>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

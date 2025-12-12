@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container my-5 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4 text-center display-6 text-dark pb-2">
+                Secure Checkout: Shipping
+            </h2>
+
+            <form action="" method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <div class="card p-5 shadow-lg border-0 rounded-4">
+                    <h5 class="card-title mb-4 pb-3 border-bottom border-primary fw-bold text-primary">
+                        1. Where Should We Ship Your Order?
+                    </h5>
+
+                    <div class="row g-4"> <div class="col-md-6">
+                            <label for="{{ form.recipient_name.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.recipient_name.label }}
+                            </label>
+                            {{ form.recipient_name|add_class:"form-control"|attr:"required" }}
+                            <div class="invalid-feedback">
+                                Please enter the recipient's name.
+                            </div>
+                    </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.recipient_phone_number.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.recipient_phone_number.label }}
+                            </label>
+                            {{ form.recipient_phone_number|add_class:"form-control"|attr:"required" }}
+                            <div class="invalid-feedback">
+                                Please enter a valid phone number.
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <label for="{{ form.recipient_email.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.recipient_email.label }}
+                            </label>
+                            {{ form.recipient_email|add_class:"form-control"|attr:"required"|attr:"type:email" }}
+                            <div class="invalid-feedback">
+                                Please enter a valid email address.
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label for="{{ form.recipient_area_postal_code.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.recipient_area_postal_code.label }}
+                            </label>
+                            {{ form.recipient_area_postal_code|add_class:"form-control"|attr:"required" }}
+                            <div class="invalid-feedback">
+                                Please enter your postal code.
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.recipient_address.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.recipient_address.label }}
+                            </label>
+                            {{ form.recipient_address|add_class:"form-control bg-light"|attr:"rows:4"|attr:"required" }}
+                            <div class="invalid-feedback">
+                                Please enter your full street address.
+                            </div>
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="col-12">
+                                <div class="alert alert-danger" role="alert">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg mt-5 fw-bolder rounded-pill shadow">
+                        Continue to Review Order
+                    </button>
+                </div>
+            </form>
+
+            {% if saved_address %}
+                <div class="mt-4 card p-4 border-0 shadow-sm bg-light border-start border-5 border-primary rounded-end-3">
+                    <h5 class="fw-bold text-dark mb-3">
+                        <i class="bi bi-geo-alt-fill me-2 text-primary"></i> Last Used Address
+                    </h5>
+                    <p class="mb-1 text-dark"><strong>Recipient:</strong> {{ saved_address.recipient_name }}</p>
+                    <p class="mb-1 text-dark"><strong>Phone:</strong> {{ saved_address.recipient_phone_number }}</p>
+                    <p class="mb-1 text-dark"><strong>Address:</strong> {{ saved_address.recipient_address }}</p>
+                    <p class="mb-1 text-dark"><strong>Postal Code:</strong> {{ saved_address.recipient_area_postal_code }}</p>
+                    <p class="mb-0 text-muted small"><strong>Email:</strong> {{ saved_address.recipient_email }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
