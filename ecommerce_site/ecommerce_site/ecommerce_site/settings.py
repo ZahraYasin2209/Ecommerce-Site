@@ -136,4 +136,9 @@ AUTH_USER_MODEL = "users.User"
 # ecommerce_site/settings.py
 
 # This tells the system that the login page is accessed via the URL pattern named 'login'.
-LOGIN_URL = 'login'
+LOGIN_URL = '/users/login'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGOUT_REDIRECT_URL = '/'

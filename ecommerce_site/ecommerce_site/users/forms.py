@@ -3,6 +3,7 @@ from django.contrib.auth.forms import (
     AuthenticationForm, UserCreationForm
 )
 
+from .choices import UserRoleChoices
 from .models import (
     ShippingAddress, User
 )
@@ -21,9 +22,11 @@ class ShippingAddressForm(forms.ModelForm):
 
 
 class CustomUserCreationForm(UserCreationForm):
+    user_role = forms.ChoiceField(choices=UserRoleChoices.choices)
+
     class Meta:
         model = User
-        fields = ["username", "email", "password1", "password2"]
+        fields = ["username", "email", "password1", "password2", "user_role"]
 
 
 class CustomLoginForm(AuthenticationForm):
@@ -40,3 +43,9 @@ class CustomLoginForm(AuthenticationForm):
             "placeholder": "Password"
         })
     )
+
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "profile_picture"]

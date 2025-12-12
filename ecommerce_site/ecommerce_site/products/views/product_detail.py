@@ -11,7 +11,6 @@ class ProductDetailView(DetailView):
     context_object_name = "product"
     pk_url_kwarg = "pk"
 
-
     queryset = Product.objects.select_related("category").prefetch_related(
         "product_details", "images", "reviews__user"
     )
