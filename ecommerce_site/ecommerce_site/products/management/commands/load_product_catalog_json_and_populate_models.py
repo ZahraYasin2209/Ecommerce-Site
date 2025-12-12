@@ -3,8 +3,7 @@ import os
 from decimal import Decimal, InvalidOperation
 
 from django.core.management.base import (
-    BaseCommand,
-    CommandError
+    BaseCommand, CommandError
 )
 from django.db import transaction
 
@@ -75,6 +74,8 @@ class Command(BaseCommand):
         total_products_counter = len(product_data_list)
         success_imports_counter = 0
 
+        product_details_to_create = []
+
         with transaction.atomic():
             for product_json_record in product_data_list:
                 try:
@@ -126,17 +127,16 @@ class Command(BaseCommand):
                     )
 
                     for size_value, _ in SizeChoices.choices:
-                        ProductDetail.objects.update_or_create(
+                        product_detail = ProductDetail(
                             product=product_instance,
                             size=size_value,
-                            defaults={
-                                "material": self.get_product_material(product_info_list),
-                                "color": product_info_list[0] if product_info_list else "N/A",
-                                "stock": DEFAULT_STOCK,
-                                "price": product_price,
-                                "description": "\n".join(product_info_list),
-                            }
+                            material=self.get_product_material(product_info_list),
+                            color=product_info_list[0] if product_info_list else "N/A",
+                            stock=DEFAULT_STOCK,
+                            price=product_price,
+                            description="\n".join(product_info_list),
                         )
+                        product_details_to_create.append(product_detail)
 
                     for image_index, image_source_url in enumerate(
                         product_json_record.get("product_images", [])
@@ -165,6 +165,8 @@ class Command(BaseCommand):
                             f"Error: {error}"
                         )
                     )
+        if product_details_to_create:
+            ProductDetail.objects.bulk_create(product_details_to_create)
 
         self.stdout.write("\n")
         self.stdout.write(
