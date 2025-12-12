@@ -21,8 +21,13 @@
                                 <p class="fw-bold mb-1">
                                     Please correct the following errors:
                                 </p>
-                                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                                {% for error in address_form.non_field_errors %}{{ error }}{% endfor %}
+                                {% for error in form.non_field_errors %}
+                                {{ error }}
+                                {% endfor %}
+
+                                {% for error in address_form.non_field_errors %}
+                                {{ error }}
+                                {% endfor %}
                             </div>
                         {% endif %}
 
@@ -31,7 +36,6 @@
                                 Personal Details
                             </h4>
                             <div class="text-center mb-4">
-                                {# Profile Picture Display #}
                                 {% if user.profile_picture %}
                                     <img src="{{ user.profile_picture.url }}" alt="Profile Picture"
                                          class="rounded-circle border border-primary border-3" style="width: 120px; height: 120px; object-fit: cover;">
@@ -88,7 +92,6 @@
                                     </p>
                                 </div>
 
-                                {% with field=form.profile_picture %}
                                 <div class="col-md-6">
                                     <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
                                         {{ field.label }}

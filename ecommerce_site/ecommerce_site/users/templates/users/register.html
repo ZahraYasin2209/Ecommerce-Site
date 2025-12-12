@@ -22,7 +22,7 @@
                 {% endif %}
 
                 {% for field in form %}
-                    {% if field.name != 'user_role' %}
+                    {% if field.name != "user_role" %}
                         <div class="form-floating mb-3">
                             {{ field|add_class:"form-control" }}
                             <label for="{{ field.id_for_label }}">
