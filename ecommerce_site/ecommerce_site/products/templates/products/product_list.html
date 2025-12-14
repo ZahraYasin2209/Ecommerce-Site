@@ -10,21 +10,21 @@
 
             <form method="get" action="{% url 'products:product_list' %}" class="mb-3">
                 <div class="input-group">
-                    <input class="form-control" name="search" placeholder="Search products..." value="{{ search }}">
+                    <input class="form-control" name="search_query" placeholder="Search products..." value="{{ search_query }}">
                     <button class="btn btn-outline-secondary">Search</button>
                 </div>
             </form>
 
             <h6>Categories</h6>
             <ul class="list-unstyled">
-                {% with current_params_all=request.GET.urlencode|cut:'page='|cut:'&page='|cut:'pk='|cut:'&pk='|cut:'search='|cut:'&search=' %}
+                {% with current_params_all=request.GET.urlencode|cut:'page='|cut:'&page='|cut:'category_id='|cut:'&category_id='|cut:'search='|cut:'&search=' %}
                 <li>
                     <a href="{% url 'products:product_list' %}?{{ current_params_all|cut:'category='|cut:'&category=' }}">All</a>
                 </li>
 
                 {% for category in categories %}
                 <li class="{% if current_category and category.pk == current_category.pk %}fw-bold{% endif %}">
-                    <a href="{% url 'products:category_products' category.pk %}?{{ current_params_all|cut:'category='|cut:'&category=' }}">
+                    <a href="{% url 'products:product_list' %}?category_id={{ category.pk }}">
                         {{ category.name }}
                     </a>
                 </li>
@@ -62,11 +62,11 @@
             <h4>Filters</h4>
             <form method="get" action="{% url 'products:product_list' %}" class="mb-4" id="filter-form">
                 {% if current_category %}
-                    <input type="hidden" name="pk" value="{{ current_category.pk }}">
+                    <input type="hidden" name="category_id" value="{{ current_category.pk }}">
                 {% endif %}
 
                 {% for parameter_key, value in request.GET.items %}
-                    {% if parameter_key != "min_price" and parameter_key != "max_price" and parameter_key != "size" and parameter_key != "page" and parameter_key != "pk" %}
+                    {% if parameter_key != "product_min_price" and parameter_key != "product_max_price" and parameter_key != "selected_product_size" and parameter_key != "page" and parameter_key != "category_id" and parameter_key != "search_query" %}
                         {% for hidden_value in request.GET.getlist.key %}
                             <input type="hidden" name="{{ parameter_key }}" value="{{ hidden_value }}">
                         {% endfor %}
@@ -76,20 +76,20 @@
                 <h6 class="mt-3">Price Range</h6>
                 <div class="mb-3">
                     <div class="d-flex justify-content-between mb-2 small">
-                        <span id="min-price-display">PKR{{ request.GET.min_price|default:'900' }}</span>
-                        <span id="max-price-display">PKR{{ request.GET.max_price|default:'75000' }}</span>
+                        <span id="min-price-display">PKR{{ request.GET.product_min_price|default:'900' }}</span>
+                        <span id="max-price-display">PKR{{ request.GET.product_max_price|default:'75000' }}</span>
                     </div>
 
-                    <input type="hidden" name="min_price" id="min-price-hidden"
-                           value="{{ request.GET.min_price|default:'900' }}">
+                    <input type="hidden" name="product_min_price" id="min-price-hidden"
+                           value="{{ request.GET.product_min_price|default:'900' }}">
 
                     <input type="range" class="form-range slider-colored" id="max-price-slider"
                            min="900" max="75000" step="500"
-                           value="{{ request.GET.max_price|default:'75000' }}"
+                           value="{{ request.GET.product_max_price|default:'75000' }}"
                            oninput="updateMaxPrice(this.value)">
 
-                    <input type="hidden" name="max_price" id="max-price-hidden"
-                           value="{{ request.GET.max_price|default:'75000' }}">
+                    <input type="hidden" name="product_max_price" id="max-price-hidden"
+                           value="{{ request.GET.product_max_price|default:'75000' }}">
 
                     <small class="text-muted">Min: PKR 900 | Max: PKR 75,000</small>
                 </div>
@@ -114,7 +114,8 @@
             </form>
 
             {% if current_category %}
-            <a href="{% url 'products:category_products' current_category.pk %}" class="btn btn-outline-danger btn-sm w-100 mt-2">
+            <a href="{% url 'products:product_list' %}?category_id={{ current_category.pk }}"
+               class="btn btn-outline-danger btn-sm w-100 mt-2">
                 Clear All Filters
             </a>
             {% else %}
@@ -150,6 +151,7 @@
                         <span class="page-link">&laquo;</span>
                     </li>
                     {% endif %}
+
                     {% for page_num in page_obj.paginator.page_range %}
                         {% if page_num >= page_obj.number|add:-2 and page_num <= page_obj.number|add:2 %}
                             {% if page_num == page_obj.number %}
@@ -165,6 +167,7 @@
                             {% endif %}
                         {% endif %}
                     {% endfor %}
+
                     {% if page_obj.has_next %}
                     <li class="page-item">
                         <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if page_removed_params %}&{{ page_removed_params }}{% endif %}">
