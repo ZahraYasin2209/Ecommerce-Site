@@ -4,6 +4,9 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView
 
 from .choices import SizeChoices
+from .constants import (
+    DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE
+)
 from .forms import ReviewForm
 from .filters import ProductQueryService, ProductFilterSet
 from .models import (
@@ -89,6 +92,8 @@ class ProductListView(ListView):
             "order": self.request.GET.get("order", "newest"),
             "size": self.request.GET.getlist("size"),
             "size_choices": SizeChoices.choices,
+            "default_min_price": DEFAULT_MIN_PRICE,
+            "default_max_price": DEFAULT_MAX_PRICE,
         })
 
         return context
