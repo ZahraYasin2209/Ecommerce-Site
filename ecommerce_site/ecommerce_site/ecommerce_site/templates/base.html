@@ -25,10 +25,11 @@
                       <a class="nav-link px-3 active" href="/">Home</a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link px-3 text-white" href="{% url 'products:category_products' 6 %}">Products</a>
-                  </li>
+                      <a class="nav-link px-3 text-white" href="{% url 'products:product_list' %}">Products</a>
+
+                      </li>
                   <li class="nav-item">
-                      <a class="nav-link px-3 text-white" href="{% url 'products:category_products' 6 %}">Categories</a>
+                      <a class="nav-link px-3 text-white" href="{% url 'products:product_list' %}">Categories</a>
                   </li>
                   <li class="nav-item">
                       <a class="nav-link px-3 text-white" href="{% url 'orders:cart_detail' %}">Cart</a>
@@ -53,7 +54,7 @@
                           <li><hr class="dropdown-divider"></li>
                           <li><hr class="dropdown-divider"></li>
                           <li>
-                              <a class="dropdown-item" href="{% url 'account:profile' %}">
+                              <a class="dropdown-item" href="{% url 'account:user_profile' %}">
                                   Profile
                               </a>
                           </li>

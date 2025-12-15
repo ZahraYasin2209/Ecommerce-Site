@@ -113,7 +113,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
 class UserPasswordChangeView(LoginRequiredMixin, SuccessMessageMixin, DjangoPasswordChangeView):
     template_name = "users/password_change.html"
-    success_url = reverse_lazy("account:profile")
+    success_url = reverse_lazy("account:user_profile")
 
 
 class ShippingAddressUpdateView(LoginRequiredMixin, UpdateView):
