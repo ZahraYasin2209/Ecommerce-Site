@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView
 
 from .choices import SizeChoices
 from .constants import (
-    DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE
+    DEFAULT_MAX_PRICE, DEFAULT_MIN_PRICE, DEFAULT_PRODUCT_ORDER
 )
 from .forms import ReviewForm
 from .filters import ProductQueryService, ProductFilterSet
@@ -73,7 +73,7 @@ class ProductListView(ListView):
         filter_set = ProductFilterSet(self.request.GET, queryset=queryset)
         product_queryset = filter_set.qs
 
-        product_sort_order = self.request.GET.get("order", "newest")
+        product_sort_order = self.request.GET.get("order", DEFAULT_PRODUCT_ORDER)
 
         product_queryset = self.product_query_service.sort_products(
             product_queryset, product_sort_order
@@ -89,7 +89,7 @@ class ProductListView(ListView):
             "categories": self.product_query_service.get_ordered_categories_with_priority(),
             "current_category": self.get_current_category(),
             "search": self.request.GET.get("search", "").strip(),
-            "order": self.request.GET.get("order", "newest"),
+            "order": self.request.GET.get("order", DEFAULT_PRODUCT_ORDER),
             "size": self.request.GET.getlist("size"),
             "size_choices": SizeChoices.choices,
             "default_min_price": DEFAULT_MIN_PRICE,
