@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="login-body-bg">
+    <div class="login-page">
+        <div class="login-card">
+            <h2 class="login-title">Welcome Back to Velora</h2>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'account:login' %}">
+                {% csrf_token %}
+
+                <div class="form-floating mb-3">
+                    {{ form.username }}
+                    <label for="{{ form.username.id_for_label }}">Username</label>
+                    {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.password }}
+                    <label for="{{ form.password.id_for_label }}">Password</label>
+                    {% if form.password.errors %}
+                        <div class="text-danger small">{{ form.password.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+                <button type="submit" class="btn-login w-100">Log In</button>
+            </form>
+
+            <p class="mt-3 text-center">
+                Don't have an account? <a href="{% url 'account:register' %}">Sign Up</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

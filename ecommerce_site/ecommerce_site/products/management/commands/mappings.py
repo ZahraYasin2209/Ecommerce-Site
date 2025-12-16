@@ -9,6 +9,5 @@ CATEGORY_MAPPING = {
     "OTHERS": "Others",
 }
 
-DEFAULT_SIZE = "N/A"
-DEFAULT_STOCK = 0
+DEFAULT_STOCK = 50
 PRODUCT_MATERIALS = ["Cotton", "Blended"]
